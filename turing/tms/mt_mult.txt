@@ -1,0 +1,66 @@
+ATM
+Multiplicador unario
+1 # $	// input alphaBet, note such comments are permitted at the end of the line
+1 # $ A C B Z // tape alphaBet
+1	// numBer of tapes
+1	// numBer of tracks on tape 0
+1	// tape 0 is 2-way infinite
+q0	// the initial state
+qa      // final state(s)
+q0  $  q1  $  R  // the transitions do not use "+" since there is only one track
+q1  1  q1  A  R
+q1  #  q2  #  L
+q2  #  q2  #  R
+q2  A  q2  Z  R
+q2  #  q2  #  R
+q2  1  q3  Z  R
+q3  1  q3  1  R
+q3  B  q4  #  L
+q4  Z  q4  Z  L
+q4  #  q4  #  L
+q4  A  q4  A  L
+q4  $  q7  $  R
+q4  1  q5  Z  L
+q5  1  q5  1  L
+q5  #  q5  #  L
+q5  Z  q5  Z  L
+q5  C  q5  C  L
+q5  A  q6  C  R
+q6  #  q6  #  R
+q6  C  q6  C  R
+q6  1  q6  1  R
+q6  Z  q6  Z  R
+q6  B  q5  Z  L
+q5  $  q7  $  R
+q7  C  q7  A  R
+q7  Z  q7  Z  R
+q7  A  q7  A  R
+q7  #  q7  #  R
+q7  1  q5  Z  L
+q7  B  q8  1  L
+q8  A  q8  1  L
+q8  Z  q8  1  L
+q8  #  q8  #  L
+q8  $  q9  $  R
+q9  1  q9  1  R
+q9  #  q9  #  R
+q9  B  q10  B  R
+q10 B  qa  B  L
+end 	//required
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

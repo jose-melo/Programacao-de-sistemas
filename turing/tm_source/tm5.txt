@@ -1,0 +1,23 @@
+ATM
+Example of multiple tapes for a^3a*b (only the top track is actually used)
+a  b	// input alphabet
+a  b  B	// tape alphabet
+4	// number of tapes
+3	// number of tracks on tape 0
+1	// number of tracks on tape 1
+2	// number of tracks on tape 2
+2	// number of tracks on tape 3
+2	// tape 0 is 2-way infinite
+1	// tape 1 is 1-way infinite
+2	// tape 2 is 2-way infinite
+1	// tape 3 is 1-way infinite
+[q0,B]	// the initial state
+[q1,B] [q2.1] [q3,X] // final states
+[q0,B]  a+B+B+B+B+B+B+B  [q1,ab]  1+B+B+B+B+B+B+B  R+R+L+S // "s" means stationary
+[q1,ab]  a+B+B+B+B+B+B+B  [q2,axy]  2+B+B+B+B+B+B+B  R+R+L+S
+[q2,axy]  a+B+B+B+B+B+B+B  [q2,zzz]  3+B+B+B+B+B+B+B  R+R+L+R
+[q2,zzz]  a+B+B+B+B+B+B+B  [q2,zzz]  4+B+B+B+B+B+B+B  R+R+L+R
+[q2,zzz]  b+B+B+B+B+B+B+B [q3,X]  5+B+B+B+B+B+B+B  L+R+L+S
+eNd
+
+

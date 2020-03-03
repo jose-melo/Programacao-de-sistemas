@@ -1,0 +1,711 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Generator" CONTENT="Microsoft Word 97">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.01 [en] (Win95; U) [Netscape]">
+   <META NAME="Author" CONTENT="Eileen Head/ Les Lander">
+   <TITLE>Turing machine simulator</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER>
+<H2>
+ANOTHER TURING MACHINE SIMULATOR, IMPLEMENTED AS A JAVA(tm) APPLICATION</H2></CENTER>
+
+<CENTER>
+<H3>
+Version 1.2 (November 1, 1997)</H3></CENTER>
+(tm) Java is a registered trademark of Sun Microsystems
+
+<P>This is a simulator for <I>deterministic</I> Turing machines, following
+the style in J. E. Hopcroft and J. D. Ullman, Introduction to Automata
+Theory, Languages, and Computation, Addison-Wesley, 1979. A simulator for
+<I>non-deterministic</I> Turing machines is being planned and will appear
+after the next project, which is a simulator for a non-deterministic push-down
+automaton.
+<BR>Please note that there is also a <A HREF="http://watson2.cs.binghamton.edu/~tools/fsm/fsmdoc.html">finite-state
+machine simulator</A> available
+<H4>
+<B>Contents:</B></H4>
+
+<UL>
+<LI>
+<A HREF="#interpreter">Obtaining the Java interpreter</A></LI>
+
+<LI>
+<A HREF="#simulator">Obtaining the Turing machine simulator</A></LI>
+
+<LI>
+<A HREF="#environment">Setting the environment</A></LI>
+
+<LI>
+<A HREF="#obtaining">Obtaining the example files</A></LI>
+
+<LI>
+<A HREF="#graphical">Using the graphical version of the Simulator</A></LI>
+
+<LI>
+<A HREF="#grader">The course-grader's quick-to-use version of the Simulator</A></LI>
+
+<LI>
+<A HREF="#quick">The short-form of the text-only version of the Simulator</A></LI>
+
+<LI>
+<A HREF="#text">The full text-only version of the Turing machine simulator</A></LI>
+
+<LI>
+<A HREF="#format">Format of the Turing Machine file</A></LI>
+
+<UL>
+<LI>
+<A HREF="#blank">The blank symbol</A></LI>
+
+<LI>
+<A HREF="#ex1">Example 1</A></LI>
+
+<LI>
+<A HREF="#ex2">Example 2</A></LI>
+
+<LI>
+<A HREF="#ex3">Example 3</A></LI>
+
+<LI>
+<A HREF="#ex4">Example 4</A></LI>
+</UL>
+</UL>
+
+<CENTER>
+<H3>
+
+<HR WIDTH="100%"></H3></CENTER>
+
+<CENTER>
+<H3>
+<A NAME="interpreter"></A><B>Obtaining the Java interpreter</B></H3></CENTER>
+Down-load the Java Development Kit using a browser (lynx, Internet explorer,
+Netscape), go to the site http://www.javasoft.com and select "Java Development
+Kit." You need to download the JDK1.1.4 (or later) for your machine, probably
+Microsoft's Windows 95/NT, although the simulator also works on many UNIX
+platforms. If you are running Windows 3.1, you must go to the IBM site
+and look there: http://www.alphaworks.ibm.com (this site does not work
+usefully with lynx). For Windows 3.1 you are looking for IBM’s ADK for
+Java 1.1.
+
+<P>Be prepared for several hours download time (try overnight).
+
+<P>The file is a self-extracting executable. It should install into the
+directory C:\jdk1.1.4 (check the installation notes if you are using IBM’s
+ADK).
+
+<P>If you plan to develop programs in Java, download the "api documentation"
+and <B>unzip it using a 32-bit (long file name) unzipper</B>. Unzip to
+C:\ with directory options on; in this way it unzips to C:\jdk1.1.4\docs
+(or later). Also download the Java tutorial when you can (let me know if
+you cannot find the tutorial.zip file). The tutorial has to be unzipped
+into the directory it will use, e.g., C:\jdk1.1.4\tutorial.&nbsp;
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="simulator"></A><B>Obtaining the Turing machine simulator</B></H3></CENTER>
+<B><I>No file</I></B> copying is necessary if you are working locally and
+using our server bingsuns.
+
+<P>For your own PC, download the file <A HREF="tmsim_bgm.zip">tmsim_bgm.zip</A>
+or <A HREF="tmsim_bgm.tar">tmsim_bgm.tar</A> and unzip from your root directory.
+We recommend that you keep the files in the directories shown and add C:\classes
+your CLASSPATH variable, <I>despite</I> the current recommendation from
+Javasoft not to use a CLASSPATH. The files provided are:
+
+<P>(the path shown is for WINDOWS, you get the equivalent on a UNIX machine)
+<BR>C:\classes\DetailText.class
+<BR>C:\classes\Grader.class
+<BR>C:\classes\QuickText.class
+<BR>C:\classes\TM.class
+<BR>C:\classes\ATuring\CButton.class
+<BR>C:\classes\ATuring\Controller$1.class
+<BR>C:\classes\ATuring\Controller$2.class
+<BR>C:\classes\ATuring\Controller$3.class
+<BR>C:\classes\ATuring\Controller$4.class
+<BR>C:\classes\ATuring\Controller$5.class
+<BR>C:\classes\ATuring\Controller.class
+<BR>C:\classes\ATuring\CreatTM.class
+<BR>C:\classes\ATuring\Key.class
+<BR>C:\classes\ATuring\MachineDescription.class
+<BR>C:\classes\ATuring\MachinePanel$1.class
+<BR>C:\classes\ATuring\MachinePanel$InputActionListener.class
+<BR>C:\classes\ATuring\MachinePanel.class
+<BR>C:\classes\ATuring\MainFrame$1.class
+<BR>C:\classes\ATuring\MainFrame$2.class
+<BR>C:\classes\ATuring\MainFrame$3.class
+<BR>C:\classes\ATuring\MainFrame$4.class
+<BR>C:\classes\ATuring\MainFrame.class
+<BR>C:\classes\ATuring\RunMachine.class
+<BR>C:\classes\ATuring\Set.class
+<BR>C:\classes\ATuring\State.class
+<BR>C:\classes\ATuring\Tape.class
+<BR>C:\classes\ATuring\TapeCanvas.class
+<BR>C:\classes\ATuring\TextDriver$InputData.class
+<BR>C:\classes\ATuring\TextDriver.class
+<BR>C:\classes\ATuring\Transition.class
+<BR>C:\classes\ATuring\TuringMachine.class
+<BR>C:\classes\ATuring\TuringMachineException.class
+<BR>C:\classes\ATuring\Viewer.class
+<BR>C:\classes\ATuring\XQTThread.class
+<BR>C:\tm_source\tm1.txt
+<BR>C:\tm_source\tm2.txt
+<BR>C:\tm_source\tm3.txt
+<BR>C:\tm_source\tm4.txt
+<BR>C:\tm_source\tm5.txt
+<BR>C:\tm_source\tm6.txt
+<BR>C:\tm_source\tm7.txt
+<BR>C:\tm_source\tm8.txt
+<BR>C:\tm_source\tmdoc.html
+<BR>C:\tm_source\tmfig1.gif
+<BR>C:\tm_source\tmfig10.gif
+<BR>C:\tm_source\tmfig11.gif
+<BR>C:\tm_source\tmfig12.gif
+<BR>C:\tm_source\tmfig2.gif
+<BR>C:\tm_source\tmfig3.gif
+<BR>C:\tm_source\tmfig4.gif
+<BR>C:\tm_source\tmfig5.gif
+<BR>C:\tm_source\tmfig6.gif
+<BR>C:\tm_source\tmfig7.gif
+<BR>C:\tm_source\tmfig8.gif
+<BR>C:\tm_source\tmfig9.gif
+<BR>C:\tm_source\input1.txt
+<BR>C:\tm_source\input3.txt
+<BR>C:\tm_source\input4.txt
+<BR>C:\tm_source\input5.txt
+<BR>C:\tm_source\input6.txt
+
+<P>This list is from the Windows95 environment, the UNIX versions will
+be similar.
+<BR>Note that Java is case sensitive, <I>even on directory names</I>.&nbsp;
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="environment"></A><B>Setting the environment</B></H3></CENTER>
+Open or create AUTOEXEC.BAT.
+
+<P>Add the following two lines after any other modification to the path
+<PRE>set path = %path%;c:\jdk1.1.4\bin
+
+set CLASSPATH = c:\classes</PRE>
+Despite suggestions in the Java installation files, we find this CLASSPATH
+very convenient. On the server bingsuns you have to modify the file ".cshrc"
+to add the lines (check which is the latest jdk)
+<PRE>setenv PATH ${PATH}:/opt/local/java/jdk1.1.4/bin
+
+
+
+setenv CLASSPATH u0/users/A/head/classes:&lt;your login path>/classes</PRE>
+
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="obtaining"></A><B>Obtaining the example files</B></H3></CENTER>
+The files obtained will be (you can also save them from the following links)
+<A HREF="tm1.txt">tm1.txt</A>, <A HREF="tm2.txt">tm2.txt</A>, <A HREF="tm3.txt">tm3.txt</A>,
+<A HREF="tm4.txt">tm4.txt</A>, <A HREF="tm5.txt">tm5.txt</A>, <A HREF="tm6.txt">tm6.txt</A>,
+<A HREF="tm7.txt">tm7.txt</A>, <A HREF="tm8.txt">tm8.txt</A>. The languages
+that these machines accept are annotated in the heading of the machine
+text and as the title of the Java frame that runs the simulation. When
+you download these files make sure there are no empty lines at the top
+of the file. They are included in the zip and tar files and will be placed
+in a subdirectory C:\tm_source.
+<BR>The test files <A HREF="input1.txt">input1.txt</A>, <A HREF="input3.txt">input3.txt</A>,
+<A HREF="input4.txt">input4.txt</A>, <A HREF="input5.txt">input5.txt</A>
+and <A HREF="input6.txt">input6.txt</A> are used in conjunction with the
+text-only versions of the program, as described below.
+<BR>&nbsp;
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="graphical"></A><B>Using the graphical version of the Simulator</B></H3></CENTER>
+When you type in the command window (MS-DOS window on Windows 95/NT and
+an X-Term window on Solaris)
+<UL>
+<LI>
+<FONT FACE="Courier">java TM</FONT></LI>
+</UL>
+you will see the frame shown in <A HREF="tmfig1.gif">Figure 1</A>.
+
+<P>If you click on "Machine" in the Menu Bar, you pull down the options
+"New Machine" and "Restart," as shown in <A HREF="tmfig2.gif">Figure 2.</A>
+
+<P>When you click on "New Machine," you get a File Dialog Box, which allows
+you to open a file that contains a description of the Turing machine that
+you are about to test, see <A HREF="tmfig3.gif">Figure 3.</A>
+
+<P>You select and open the appropriate file. The format for the file is
+described later. The simulator will load and display the tape of the machine
+and the initial state, see <A HREF="tmfig4.gif">Figure 4</A>. If there
+are detectable errors in the format of your machine these will be reported
+in your command window.
+
+<P>Next you should insert an input string. If you do not, the input will
+be assumed to be the empty string. To insert an input string, click in
+the empty text field next to the button "Accept Input Tape." Type in the
+input string,&nbsp; <A HREF="tmfig5.gif">Figure 5</A>, <I>and click the
+button OR hit enter, </I><A HREF="tmfig6.gif">Figure 6</A>.
+
+<P>The control bar allows you to proceed <I>one step at a time</I> (by
+pressing "Step") or <I>run continuously at different speeds</I> (by pressing
+one of the smaller buttons, which will show up red). See <A HREF="tmfig7.gif">Figure
+7</A>.
+
+<P><B>NOTES</B>
+<UL>
+<LI>
+The blank symbol does not show on the tapes of the graphical simulation
+but it is expressed by the symbol "B" when it appears in a transition in
+the file describing the Turing Machine, e.g. the transition <TT>q3 B q4
+B R</TT> in Example 1.</LI>
+</UL>
+
+<UL>
+<LI>
+The simulator has special feature that allows the machine to run <I>in
+reverse</I>, thereby undoing all the transitions that have occurred. Reverse
+execution <I>is not possible</I> after the machine halts (either in an
+accepting or a non-accepting state).</LI>
+</UL>
+The number of transition steps executed so far is shown at the top right
+of the frame.
+
+<P>This message is replaced with an "ACCEPTED" or "Not accepted" message
+when the machine halts. <A HREF="tmfig7.gif">Figure 7</A>. shows the machine
+running, <A HREF="tmfig8.gif">Figure 8</A> shows the machine when it accepts
+the input and <A HREF="tmfig9.gif">Figure 9</A> shows the machine when
+it fails to accept an input. Notice that in <A HREF="tmfig8.gif">Figure
+8</A> and <A HREF="tmfig9.gif">Figure 9</A>, the command window also shows
+a final status message.
+
+<P>The Turing machine also allows you to introduce a "New Input," which
+is selected under "Options" on the menu bar, and to "Restart" the machine
+<I>with the same input</I>, which is selected under "Machine" on the menu
+bar. See <A HREF="tmfig10.gif">Figure 10</A> and <A HREF="tmfig11.gif">Figure
+11</A>
+
+<P>The machine can handle 1-way infinite tapes, 2-way infinite tapes, multiple
+tapes, multiple tracks and compound states. <A HREF="tmfig12.gif">Figure
+12</A> shows the Turing machine simulator with several tapes and tracks.
+<CENTER>
+<H3>
+
+<HR WIDTH="100%">&nbsp;<A NAME="grader"></A>The course-grader's quick-to-use
+version of the Simulator</H3></CENTER>
+When a course grader is presented with a large number of Turing Machine
+text files to check, one time saving approach is to run all the machines
+against a set of test inputs. The grader should prepare a file with a number
+of test cases, for example the file <A HREF="input1.txt">input1.txt</A>
+shown below. The first line (300) is an upper limit on the number of steps
+that the simulation can run for [Turing machines may run for ever]. The
+second line (18) is the total number of test cases in the file. Lines 3
+through 20 are the test cases. Line 6 contains a "B" representing the blank
+symbol, which means the input string is empty.
+<PRE>300
+18
+01
+00001111
+000000000000111111111111
+B
+11110101111110
+11110101111110111110
+101010
+1010100
+10101010
+000
+0000
+1010101010
+101010100
+11111111
+0
+00
+00000
+0110111</PRE>
+To run the grader's version, type the following:
+<PRE>java Grader</PRE>
+or
+<PRE>java Grader input1.txt</PRE>
+or
+<PRE>java Grader input1.txt tm1.txt</PRE>
+If the command-line parameters are not provided, there will be prompts
+to ask for them.
+<BR>In the example below, the grader is working in the directory "tm_source"
+and types in the name of the common set of test cases in the file <A HREF="input1.txt">input1.txt</A>.
+Then there is a prompt for the next Turing Machine to test.
+<BR>In this example, the machine file <A HREF="tm1.txt">tm1.txt</A> was
+used. The following lines give the test results: "YES" means the current
+input was accepted and "TuringMachineException, ..." indicates that the
+simulation was abandoned because the necessary transition was not defined
+(this possibility is quite normal and means that the Turing machine rejects
+the input). After checking whether the tests match the correct responses,
+the program asks for another Turing Machine file to test (against the same
+test inputs) so that the grader can run through all the solutions to a
+specific problem.
+<BR>The Grader program does not provide useful information for those examples
+where the Turing Machine is being used to compute a value (e.g. <A HREF="tm6.txt">tm6.txt</A>
+computes the product of two numbers). It is more convenient to use <A HREF="#quick">QuickText</A>
+in this case.
+<PRE>C:\tm_source>java Grader
+Enter Input File Name: input1.txt</PRE>
+
+<PRE>TITLE: NEW MACHINE
+Enter Input File Name: input1.txt</PRE>
+
+<PRE>TITLE: NEW MACHINE
+Enter TuringMachine FileName: tm1.txt
+&nbsp;INPUT: 000111&nbsp;&nbsp; YES
+&nbsp;INPUT: 00000000001111111111&nbsp;&nbsp; YES
+&nbsp;INPUT: 01&nbsp;&nbsp; YES
+&nbsp;INPUT: B&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 11110101111110&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 11110101111110111110&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 101010&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 1010100&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 10101010&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 000&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q1
+&nbsp;INPUT: 0000&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q1
+&nbsp;INPUT: 1010101010&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 101010100&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 11111111&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp;INPUT: 0&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q1
+&nbsp;INPUT: 00&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q1
+&nbsp;INPUT: 00000&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q1
+&nbsp;INPUT: 0001111&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q3</PRE>
+
+<PRE>Another Machine? Y/N</PRE>
+
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="quick"></A><B>The short-form of the text-only version of the Simulator</B></H3></CENTER>
+A second text-only versions is designed to let a student work at an ASCII
+terminal, typically through a dial-up connection, which normally prevents
+the use of the GUI version. To run the simpler version, simply type one
+of the following:
+<PRE>java QuickText</PRE>
+or
+<PRE>java QuickText input1.txt</PRE>
+or
+<PRE>java QuickText input1.txt tm1.txt</PRE>
+or
+<PRE>java QuickText input1.txt tm1.txt log1.txt</PRE>
+If the parameter "log1.txt" is not provided, the default is "report.txt."
+If the other parameters are not provided, there will be prompts to request
+them. The file of test cases <A HREF="input1.txt">input1.txt</A> is the
+same as before. The following example shows the use of the same Turing
+Machine <A HREF="tm1.txt">tm1.txt</A>, which was used above.
+<PRE>C:\tm_source>java QuickText
+Enter Input File Name: input1.txt</PRE>
+
+<PRE>TITLE: NEW MACHINE
+Enter TuringMachine FileName: tm1.txt
+
+Ready? return</PRE>
+The program reports on whether the Turing Machine accepted a particular
+input from the file <A HREF="input1.txt">input1.txt</A>, in this case.
+The reports come in groups of 5. Examples include the following (the second
+example is a test with a empty input, note that "T/T" means "tapes/tracks"
+and "0/0" means "tape 0/track 0"):
+<PRE>TITLE: NEW MACHINE</PRE>
+
+<PRE>TITLE&nbsp; MACHINE: Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INPUT: 000111
+&nbsp; STATUS: Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape Accepts string in 25 steps.
+&nbsp; STATUS: FINAL T/T: (0/0) BBBBBBBBBBBBBXXXYYYB&lt;read-head>BBBBBBBBBBBBBBBBBBBB</PRE>
+
+<PRE>TITLE&nbsp; MACHINE: Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INPUT: B
+&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q0
+&nbsp; STATUS:&nbsp;&nbsp; Execution terminated Error in Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape , Step#1
+&nbsp; STATUS: FINAL T/T: (0/0) BBBBBBBBBBBBBBBBBBBB&lt;read-head>BBBBBBBBBBBBBBBBBBBB</PRE>
+
+<PRE>TITLE&nbsp; MACHINE: Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INPUT: 0001111
+&nbsp; TuringMachineException:&nbsp;&nbsp; No transition for q3
+&nbsp; STATUS:&nbsp;&nbsp; Execution terminated Error in Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape , Step#25
+&nbsp; STATUS: FINAL T/T: (0/0) BBBBBBBBBBBBBBXXXYYY&lt;read-head>1BBBBBBBBBBBBBBBBBBB</PRE>
+The same information shown on the screen is saved in a slightly different
+format in the log file (default name: report.txt).
+<BR><B>Note</B> that the symbol "B" is used to denote a blank symbol on
+the tape.
+
+<P>
+<HR WIDTH="100%">
+<CENTER>
+<H3>
+<A NAME="text"></A><B>The full text-only version of the Turing machine
+simulator</B></H3></CENTER>
+For the text-only version, the Turing Machine files are prepared in the
+same way as for the graphical version of the simulator. In this case, as
+before you need to prepare a file of inputs such as <A HREF="input1.txt">input1.txt</A>.
+The file was described in the section on the <A HREF="#grader">Grader's
+version</A> of the program. The results of the tests will be written to
+an output log, which has a default name is "report.txt" but that can be
+modified by the user. This text-only version can be run using one of the
+following choices:
+<PRE>java DetailText</PRE>
+or
+<PRE>java DetailText input1.txt</PRE>
+or
+<PRE>java DetailText input1.txt tm1.txt</PRE>
+or
+<PRE>java DetailText input1.txt tm1.txt log1.txt</PRE>
+If the parameter "log1.txt" is not provided, the default is "report.txt."
+If the other parameters are not provided, there will be prompts to request
+them. On the screen the results of each test are shown in exactly the same
+way as for the QuickText program described above(accept/reject on account
+of a missing transition) with the name of the machine, the test input,
+the state where execution ended. The big difference is in the log file.
+Note that in this version, after each run of the simulator, you may also
+change the Turing Machine, keeping the same test file (this feature is
+provided specifically for the grader who might be diagnosing the failure
+of students' work).
+
+<P>The format of the log file is shown in the following examples taken
+from <A HREF="tm1.txt">tm1.txt</A> and <A HREF="input1.txt">input1.txt</A>
+<BR>Each step shows the tape contents. The read/write head is considered
+to be looking at the tape symbol written immediately after the &lt;read-head>
+marker.
+<PRE>...
+
+
+
+TITLE&nbsp; MACHINE: Version of Hopcroft &amp; Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INPUT: 000111
+&nbsp; SNAPSHOT:&nbsp;&nbsp; START State:q0
+&nbsp; SNAPSHOT:&nbsp;&nbsp; Machine Tapes:
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBBBBBBB&lt;read-head>000111BBBB
+&nbsp; SNAPSHOT:&nbsp;&nbsp;
+
+&nbsp; SNAPSHOT: Step number: 1,&nbsp; Current State: q1
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBBBBBBX&lt;read-head>00111BBBBB
+
+&nbsp; SNAPSHOT: Step number: 2,&nbsp; Current State: q1
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBBBBBX0&lt;read-head>0111BBBBBB</PRE>
+
+<PRE>...</PRE>
+
+<PRE>&nbsp; SNAPSHOT: Step number: 24,&nbsp; Current State: q3
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBXXXYYY&lt;read-head>BBBBBBBBBB
+
+&nbsp; SNAPSHOT: Step number: 25,&nbsp; Current State: q4
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBXXXYYYB&lt;read-head>BBBBBBBBBB
+
+&nbsp; SNAPSHOT: Stopped ACCEPTED after Step: 25
+&nbsp; SNAPSHOT: FINAL TAPE(S):&nbsp;
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBBBBBBBBBBXXXYYYB&lt;read-head>BBBBBBBBBBBBBBBBBBBB</PRE>
+From <A HREF="tm5.txt">tm5.txt</A> and <A HREF="input5.txt">input5.txt</A>,
+we show two of the steps. Note that just a single step covers several lines;
+each track of each tape is listed separately. Note that one-way infinite
+tapes may have fewer (or no) symbols to the left of the read/write head
+than the two-way infinite tapes, which always have the same number of symbols
+to the left of the read/write head. In this example, the individual tapes
+and tracks are identified by the pairs 00, 01, 02, 10, 20, 21, 30, 31.
+<PRE>...</PRE>
+
+<PRE>&nbsp; SNAPSHOT: Step number: 2,&nbsp; Current State: [q2,axy]
+&nbsp; SNAPSHOT: (Tape,Track):(00) BBBBBBBB12&lt;read-head>aaaaaaaaaa
+&nbsp; SNAPSHOT: (Tape,Track):(01) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(02) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(10)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(20) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(21) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(30)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(31)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;read-head>BBBBBBBBBB</PRE>
+
+<PRE>...</PRE>
+
+<PRE>&nbsp; SNAPSHOT: Step number: 15,&nbsp; Current State: [q2,zzz]
+&nbsp; SNAPSHOT: (Tape,Track):(00) 4444444444&lt;read-head>aaabBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(01) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(02) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(10) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(20) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(21) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(30) BBBBBBBBBB&lt;read-head>BBBBBBBBBB
+&nbsp; SNAPSHOT: (Tape,Track):(31) BBBBBBBBBB&lt;read-head>BBBBBBBBBB</PRE>
+<B>Note</B> that the symbol "B" is used to denote a blank symbol on the
+tape.
+<BR>
+<HR WIDTH="100%">
+<CENTER><A NAME="format"></A><B>Format of the Turing Machine file</B></CENTER>
+
+
+<P>The format for the Turing machine files is the following. The first
+line indicates that this is A Turing Machine file. Later versions of the
+tool will also work with files describing finite state machines and push-down
+automata. There should be <I>no blank lines</I>:
+
+<P>Line 1: ATM.
+<BR>Line 2: name of the machine. For assignments use name(s) and assignment
+number
+<BR>Line 3: all characters in the input alphabet, separated by spaces
+<BR>Line 4: all characters in the tape alphabet, separated by spaces
+<BR>Line 5: the number of tapes (N). They are numbered 0,…, N-1
+<BR>Line 6: the number of tracks on tape 0 (T<SUB>0</SUB>)
+<BR>Line 7: the number of tracks on tape 1 (if N > 1) (T<SUB>1</SUB>)
+<BR>…
+<BR>Line N+5: the number of tracks on tape N-1 (T<SUB>N-1</SUB>)
+<BR>Line N+6: 1 or 2, indicating tape 0 is 1-way or 2-way infinite tape
+<BR>Line N+7: 1 or 2, indicating tape 1 is 1-way or 2-way infinite
+<BR>…
+<BR>Line 2N+5: 1 or 2, indicating tape N-1 is 1-way or 2-way infinite
+<BR>Line 2N+6: the initial state of the Turing machine
+<BR>Line 2N+7: all the final states separated by spaces
+<BR>Line 2N+8: first of a list of transition (see below)
+<BR>Line 2N+9: another transition
+<BR>…
+<BR>Line 2N+?: last of the list of transitions
+<BR>Last line: end. You must type the word "end" but it can be upper or
+lower case
+
+<P>The format of a transition is:
+
+<P>&lt;state> &lt;content of tracks> &lt;next-state> &lt;next content of
+tracks> &lt;head-move directions>
+
+<P>where
+<UL>
+<LI>
+the &lt;state> and &lt;next-state> are the names of states (simple strings).
+When the state has multiple fields such as [q0,a,b], there can be <I>no
+spaces</I>. This compound state is handled in the simulator as a <I>single
+string</I>, without spaces.</LI>
+
+<LI>
+the &lt;content of tracks> and &lt;next content of tracks> have the general
+form: X<SUB>1</SUB>+X<SUB>2</SUB>+X<SUB>3</SUB>+…+X<SUB>L</SUB>, where
+L is the total number of tracks, i.e. L is the sum of T<SUB>0</SUB>, T<SUB>1</SUB>,
+T<SUB>2</SUB>, …, T<SUB>N-1</SUB> and the X<SUB>j</SUB> are the symbols
+on the individual tracks above the read/write head. Actually there is a
+read/write head for each tape but only one is shown in the graphical simulator.</LI>
+
+<LI>
+the &lt;head-move directions> has the general form d<SUB>1</SUB>+d<SUB>2</SUB>+…+d<SUB>N</SUB>,
+where each d<SUB>j</SUB> is R, L or S, indicating a right or left movement
+or staying stationary of the tape head.</LI>
+</UL>
+
+<H4>
+<A NAME="blank"></A>The Blank Symbol</H4>
+As shown in the examples below, the blank tape symbol is denoted by "B"
+and this symbol <I>must not</I> be used as part of the input alphabet.
+The blank symbol is not shown on the tapes of the graphical simulator.
+<H4>
+<A NAME="ex1"></A>Example 1:</H4>
+
+<PRE>ATM
+Hopcroft &amp; Ullman’s TM for {0^n 1^n : n > 0} (file name tm1.txt)&nbsp;
+0 1 // input alphabet, note such comments are permitted at the end of the line&nbsp;
+0 1 X Y B // tape alphabet&nbsp;
+1 // number of tapes&nbsp;
+1 // number of tracks on tape 0&nbsp;
+2 // tape 0 is 2-way infinite&nbsp;
+q0 // the initial state&nbsp;
+q4 // final state
+q0 0 q1 X R // the transitions do not use "+" since there is only one track&nbsp;
+q0 Y q3 Y R&nbsp;
+q1 0 q1 0 R&nbsp;
+q1 1 q2 Y L&nbsp;
+q1 Y q1 Y R&nbsp;
+q2 0 q2 0 L&nbsp;
+q2 X q0 X R&nbsp;
+q2 Y q2 Y L&nbsp;
+q3 Y q3 Y R&nbsp;
+q3 B q4 B R&nbsp;
+end //required</PRE>
+
+<H4>
+<A NAME="ex2"></A>Example 2:</H4>
+
+<PRE>ATM
+Hopcroft &amp; Ullman’s TM for 01* + 10* (file name cs373b.txt)&nbsp;
+0 1 // input alphabet&nbsp;
+0 1 B // tape alphabet&nbsp;
+1 // number of tapes&nbsp;
+1 // number of tracks on tape 0&nbsp;
+2 // tape 0 is 2-way infinite&nbsp;
+[q0,B] // the initial state NOTE THERE CAN BE NO SPACES IN THIS STRING&nbsp;
+1 // the number of final states&nbsp;
+[q1,B] // the final state&nbsp;
+[q0,B] 0 [q1,0] 0 R // the transitions do not use "+" since there is only one track&nbsp;
+[q0,B] 1 [q1,1] 1 R //NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+[q1,0] 1 [q1,0] 1 R //NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+[q1,1] 0 [q1,1] 0 R //NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+[q1,0] B [q1,B] 0 L //NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+[q1,1] B [q1,B] 0 L //NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+end</PRE>
+
+<H4>
+<A NAME="ex3"></A>Example 3:</H4>
+
+<PRE>ATM
+Hopcroft &amp; Ullman’s TM for {wcw | w in (a + b)^+} (file name cs373c.txt)&nbsp;
+a b // input alphabet&nbsp;
+a b T B // tape alphabet&nbsp;
+1 // number of tapes&nbsp;
+2 // number of tracks on tape 0&nbsp;
+2 // tape 0 is 2-way infinite&nbsp;
+[q1,B] // initial state&nbsp;
+[q9,B] // the final state, NOTE THERE CAN BE NO SPACES IN ANY OF THE STATES&nbsp;
+[q1,B] a+B [q2,a] a+T r // "a+B" means "a" on the top track, "B" on the lower track&nbsp;
+[q1,B] b+B [q2,b] b+T r // the single "r" means the tape head moves right&nbsp;
+[q2,a] a+B [q2,a] a+B r&nbsp;
+[q2,a] b+B [q2,a] b+B r&nbsp;
+[q2,b] a+B [q2,b] a+B r&nbsp;
+[q2,b] b+B [q2,b] b+B r&nbsp;
+[q2,a] c+B [q3,a] c+B r&nbsp;
+[q2,b] c+B [q3,b] c+B r&nbsp;
+[q3,a] a+T [q3,a] a+T r&nbsp;
+[q3,a] b+T [q3,a] b+T r&nbsp;
+[q3,b] a+T [q3,b] a+T r&nbsp;
+[q3,b] b+T [q3,b] b+T r&nbsp;
+[q3,a] a+B [q4,B] a+T l&nbsp;
+[q3,b] b+B [q4,B] b+T l&nbsp;
+[q4,B] a+T [q4,B] a+T l&nbsp;
+[q4,B] b+T [q4,B] b+T l&nbsp;
+[q4,B] c+B [q5,B] c+B l&nbsp;
+[q5,B] a+B [q6,B] a+B l&nbsp;
+[q5,B] b+B [q6,B] b+B l&nbsp;
+[q6,B] a+B [q6,B] a+B l&nbsp;
+[q6,B] b+B [q6,B] b+B l&nbsp;
+[q6,B] a+T [q1,B] a+T r&nbsp;
+[q6,B] b+T [q1,B] b+T r&nbsp;
+[q5,B] a+T [q7,B] a+T r&nbsp;
+[q5,B] b+T [q7,B] b+T r&nbsp;
+[q7,B] c+B [q8,B] c+B r&nbsp;
+[q8,B] a+T [q8,B] a+T r&nbsp;
+[q8,B] b+T [q8,B] b+T r&nbsp;
+[q8,B] B+B [q9,B] B+T l&nbsp;
+end</PRE>
+
+<H4>
+<A NAME="ex4"></A>Example 4:</H4>
+
+<PRE>ATM
+An example of multiple tapes (cs373d.txt). It recognizes a<SUP>3</SUP>a*b (only the top track is actually used)&nbsp;
+a b // input alphabet&nbsp;
+a b B // tape alphabet&nbsp;
+4 // number of tapes&nbsp;
+3 // number of tracks on tape 0&nbsp;
+1 // number of tracks on tape 1&nbsp;
+2 // number of tracks on tape 2&nbsp;
+2 // number of tracks on tape 3&nbsp;
+2 // tape 0 is 2-way infinite&nbsp;
+1 // tape 1 is 1-way infinite&nbsp;
+2 // tape 2 is 2-way infinite&nbsp;
+1 // tape 3 is 1-way infinite&nbsp;
+[q0,B] // the initial state&nbsp;
+[q1,B] [q2.1] [q3,X] // final states
+[q0,B] a+B+B+B+B+B+B+B [q1,ab] 1+B+B+B+B+B+B+B R+R+L+S // "S" means stationary&nbsp;
+[q1,ab] a+B+B+B+B+B+B+B [q2,axy] 2+B+B+B+B+B+B+B R+R+L+S&nbsp;
+[q2,axy] a+B+B+B+B+B+B+B [q2,zzz] 3+B+B+B+B+B+B+B R+R+L+R&nbsp;
+[q2,zzz] a+B+B+B+B+B+B+B [q2,zzz] 4+B+B+B+B+B+B+B R+R+L+R&nbsp;
+[q2,zzz] b+B+B+B+B+B+B+B [q3,X] 5+B+B+B+B+B+B+B L+R+L+S&nbsp;
+eNd</PRE>
+
+</BODY>
+</HTML>

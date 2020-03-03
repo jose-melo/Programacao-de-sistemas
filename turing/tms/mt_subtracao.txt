@@ -1,0 +1,34 @@
+ATM
+Subtrator unario
+1 # $	// input alphaBet, note such comments are permitted at the end of the line
+1 # $ X B // tape alphaBet
+1	// numBer of tapes
+1	// numBer of tracks on tape 0
+1	// tape 0 is 2-way infinite
+q0	// the initial state
+qa      // final state(s)
+q0  $  q1  $  R  // the transitions do not use "+" since there is only one track
+q1  1  q1  1  R
+q1  #  q2  #  R
+q2  #  q2  #  R
+q2  X  q2  X  R
+q2  B  q4  #  L
+q2  1  q3  X  L
+q4  X  q4  X  L
+q4  #  q4  #  L
+q4  1  q5  X  R
+q4  $  q6  $  R
+q5  X  q5  X  R
+q5  #  q5  #  R
+q5  1  q5  1  R
+q5  B  q4  X  L
+q3  1  q2  X  R
+q3  #  q3  #  L
+q3  X  q3  X  L
+q3  $  qr  $  L
+q6  X  q6  1  R
+q6  #  q6  #  R
+q6  1  q6  1  R
+q6  B  qa  1  R
+end 	//required
+

@@ -1,0 +1,40 @@
+ATM
+Hopcroft & Ullman's TM for {wcw | w in (a + b)^+}
+a b 	// input alphabet
+a b T B  // tape alphabet
+1	// number of tapes
+2	// number of tracks on tape 0
+2	// tape 0 is 2-way infinite
+[q1,B]	// initial state
+[q9,B]	// the final state
+[q1,B]  a+B  [q2,a]  a+T  r  // "a+B" means "a" on the top track, "B" on the lower track
+[q1,B]  b+B  [q2,b]  b+T  r  // the single "r" means the tape head moves right
+[q2,a]  a+B  [q2,a]  a+B  r
+[q2,a]  b+B  [q2,a]  b+B  r
+[q2,b]  a+B  [q2,b]  a+B  r
+[q2,b]  b+B  [q2,b]  b+B  r
+[q2,a]  c+B  [q3,a]  c+B  r
+[q2,b]  c+B  [q3,b]  c+B  r
+[q3,a]  a+T  [q3,a]  a+T  r
+[q3,a]  b+T  [q3,a]  b+T  r
+[q3,b]  a+T  [q3,b]  a+T  r
+[q3,b]  b+T  [q3,b]  b+T  r
+[q3,a]  a+B  [q4,B]  a+T  l
+[q3,b]  b+B  [q4,B]  b+T  l
+[q4,B]  a+T  [q4,B]  a+T  l
+[q4,B]  b+T  [q4,B]  b+T  l
+[q4,B]  c+B  [q5,B]  c+B  l
+[q5,B]  a+B  [q6,B]  a+B  l
+[q5,B]  b+B  [q6,B]  b+B  l
+[q6,B]  a+B  [q6,B]  a+B  l
+[q6,B]  b+B  [q6,B]  b+B  l
+[q6,B]  a+T  [q1,B]  a+T  r
+[q6,B]  b+T  [q1,B]  b+T  r
+[q5,B]  a+T  [q7,B]  a+T  r
+[q5,B]  b+T  [q7,B]  b+T  r
+[q7,B]  c+B  [q8,B]  c+B  r
+[q8,B]  a+T  [q8,B]  a+T  r
+[q8,B]  b+T  [q8,B]  b+T  r
+[q8,B]  B+B  [q9,B]  B+T  l
+end
+

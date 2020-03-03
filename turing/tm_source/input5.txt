@@ -1,0 +1,8 @@
+200
+4
+B
+aaa
+ababbaabababbaab
+aaaaaaaaaaaaaaaaaab
+
+

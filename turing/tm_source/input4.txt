@@ -1,0 +1,12 @@
+200
+8
+B
+aaacaaa
+ababbaabcababbaab
+babbaabcababbaab
+ababbaacababbaab
+ababbaabcababbaa
+ababbaabcababaab
+abababaaa
+
+

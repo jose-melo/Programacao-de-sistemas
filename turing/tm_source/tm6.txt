@@ -1,0 +1,33 @@
+ATM
+Hopcroft & Ullman's TM for the function 0^m10^n1 -> 0^(m+n)
+0 1	// input alphabet, note such comments are permitted at the end of the line
+0 1 2 B // tape alphabet
+1	// number of tapes
+1	// number of tracks on tape 0
+2	// tape 0 is 2-way infinite
+q0	// the initial state
+q12     // final state
+q0  0  q6  B  r
+q6  0  q6  0  r
+q6  1  q1  1  r
+q1  0  q2  2  r
+q1  1  q4  1  l
+q2  0  q2  0  r
+q2  1  q2  1  r
+q2  B  q3  0  l
+q3  0  q3  0  l
+q3  1  q3  1  l
+q3  2  q1  2  r
+q4  1  q5  1  r
+q4  2  q4  0  l
+q5  0  q7  0  l
+q7  1  q8  1  l
+q8  0  q9  0  l
+q8  B  q10 B  r
+q9  0  q9  0  l
+q9  B  q0  B  r
+q10 1  q11 B  r
+q11 0  q11 B  r
+q11 1  q12 B  r
+end 	//required
+

@@ -1,0 +1,182 @@
+ATM
+Multiplicador unario
+1 # $	// input alphaBet, note such comments are permitted at the end of the line
+1 # $ B X Y R S M N W F Z// tape alphaBet
+1	// numBer of tapes
+1	// numBer of tracks on tape 0
+1	// tape 0 is 2-way infinite
+q0	// the initial state
+qa      // final state(s)
+q0  $  q1  $  R  // the transitions do not use "+" since there is only one track
+q1  1  q1  1  R
+q1  0  q1  0  R
+q1  #  q2  J  R
+q2  1  q2  1  R
+q2  0  q2  0  R
+q2  B  q3  S  L
+q3  0  q3  0  L
+q3  1  q3  1  L
+q3  X  q3  X  L
+q3  Q  q3  Q  L
+q3  P  q3  P  L
+q3  Y  q3  Y  L
+q3  J  q4  J  L
+q3  S  q3  S  L
+q4  X  q4  X  L
+q4  Y  q4  Y  L
+q4  $  q5  $  R
+q4  1  q6  X  R
+q4  0  q8  Y  R
+q5  0  q5  0  R
+q5  1  q5  1  R
+q5  X  q5  X  R
+q5  Y  q5  Y  R
+q5  J  q5  J  R
+q5  P  q5  P  R
+q5  Q  q5  Q  R
+q5  S  q5  S  R
+q5  W  q9  M  L
+q5  B  q9  K  L
+q6  S  q6  S  R
+q6  Q  q6  Q  R
+q6  P  q6  P  R
+q6  0  q6  0  R
+q6  1  q6  1  R
+q6  X  q6  X  R
+q6  Y  q6  Y  R
+q6  S  q6  S  R
+q6  J  q6  J  R
+q6  W  q7  Q  R
+q6  B  q9  M  L
+q7  B  q9  M  L
+q8  0  q8  0  R
+q8  1  q8  1  R
+q8  J  q8  J  R
+q8  X  q8  X  R
+q8  Q  q8  Q  R
+q8  P  q8  P  R
+q8  Y  q8  Y  R
+q8  S  q8  S  R
+q8  B  q9  N  L
+q8  W  q9  M  L
+q9  0  q9  0  L
+q9  1  q9  1  L
+q9  X  q9  X  L
+q9  Y  q9  Y  L
+q9  S  q9  S  L
+q9  M  q9  M  L
+q9  Q  q9  Q  L
+q9  P  q9  P  L
+q9  N  q9  N  L
+q9  S  q10  S  L
+q10  X  q10  X  L
+q10  Y  q10  Y  L
+q10  1  q11  X  R
+q10  0  q14  Y  R
+q10  J  q13  J  R
+q11  0  q11  0  R
+q11  1  q11  1  R
+q11  Q  q11  Q  R
+q11  P  q11  P  R
+q11  J  q11  J  R
+q11  X  q11  X  R
+q11  Y  q11  Y  R
+q11  S  q11  S  R
+q11  K  q3  P  L
+q11  M  q12  Q  R
+q11  N  q3  P  L
+q12  B  q3  W  L
+q13  X  q13  X  R
+q13  P  q13  P  R
+q13  Q  q13  Q  R
+q13  Y  q13  Y  R
+q13  S  q13  S  R
+q13  N  q3  Q  L
+q13  M  q3  P  L
+q13  W  q3  P  L
+q13  K  q15  K  L
+q14  X  q14  X  R
+q14  Q  q14  Q  R
+q14  P  q14  P  R
+q14  Y  q14  Y  R
+q14  J  q14  J  R
+q14  S  q14  S  R
+q14  K  q3  Q  L
+q14  N  q3  Q  L
+q14  M  q3  P  L
+q13  W  q3  P  L
+q13  K  q15  K  L
+q15  K  q15  K  L
+q15  Z  q15  Z  L
+q15  1  q15  1  L
+q15  0  q15  0  L
+q15  P  q16  Z  R
+q15  Q  q17  Z  R
+q15  S  q18  S  R
+q16  Z  q16  Z  R
+q16  K  q16  K  R
+q16  0  q16  0  R
+q16  1  q16  1  R
+q16  B  q15  1  L
+q17  Z  q17  Z  R
+q17  K  q17  K  R
+q17  0  q17  0  R
+q17  1  q17  1  R
+q17  B  q15  0  L
+q18  Z  q18  Z  R
+q18  K  q19  K  R
+q19  X  q19  X  R
+q19  Y  q19  Y  R
+q19  F  q19  F  R
+q19  B  q24  B  L
+q19  1  q20  F  L
+q19  0  q22  F  L
+q20  1  q20  1  L
+q20  0  q20  0  L
+q20  F  q20  F  L
+q20  K  q20  K  L
+q20  Z  q20  Z  L
+q20  S  q21  S  R
+q21  1  q21  1  R
+q21  0  q21  0  R
+q21  Z  q18  1  R
+q22  1  q22  1  L
+q22  0  q22  0  L
+q22  K  q22  K  L
+q22  F  q22  F  L
+q22  Z  q22  Z  L
+q22  S  q23  S  R
+q23  1  q23  1  R
+q23  0  q23  0  R
+q23  Z  q18  0  R
+q24  F  q24  B  L
+q24  K  q24  B  L
+q24  X  q24  1  L
+q24  Y  q24  0  L
+q24  S  q24  #  L
+q24  J  q24  #  L
+q24  1  q24  1  L
+q24  0  q24  0  L
+q24  $  q25  $  R
+q25  1  q25  1  R
+q25  0  q25  0  R
+q25  #  q25  #  R
+q25  B  qa  B  R
+end 	//required
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+0000 0100;
+003F 0000;
+0040 0000; endereço de save
+0042 0001; N
+0044 0002; CTE 2
+0046 0001; CTE 1
+0048 9000; para montar a inst.
+004A 0001; var auxiliar
+004C 0040; end de parada
+;
+0100 8040; load no end. de save
+0102 4048; soma com 9000
+0104 9108; monto a instrucao
+0106 804A; load no n**2
+0108 0000; salva n**2 no end de save
+010A 8042; load do N
+010C 6044; N*2
+010E 4001; 2n + 1
+0110 404A; aux += 2n + 1
+0112 8040; load end de save
+0114 4044; acc = endSave + 2
+0116 9040; endSave += 2
+0118 8042; load no N
+011A 4046; acc = n + 1
+011C 9042; n += 1
+011E 8040; load no end save
+0120 504C; acc = endSave - parada
+0122 1126; pula se acabou
+0124 0100; loop
+0126 C126; fims

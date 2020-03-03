@@ -1,0 +1,91 @@
+
+0000 0800  ; Pula para o início das instruções;
+;
+; ===========================================================================
+; Área de dados
+; ===========================================================================
+;
+00EC 0064  ; constante: 0x064
+00EE 000A  ; constante: 0x00A
+00F0 0030  ; constante: 0x030
+00F2 1000  ; Constante: 0x1000
+00F4 0010  ; Constante: 0x0010
+00F6 0001  ; Constante: 0x0001
+00F8 0100  ; Constante: 0x0100
+00FA 0000  ; Variável: Num 1
+0100 0000  ; Variável auxiliar
+0102 0000  ; Saída da função de leitura
+0104 0000  ; resposta hexa
+0106 0000  ; resposta unidades
+0108 0000  ; resposta dezenas
+010A 0000  ; resposta centenas
+;
+; ===========================================================================
+; Programa
+; Obs: o programa não está otimizado para desempenho, e sim para
+; compreensão da sua lógica. A ordem de algumas operações poderia ser
+; trocada para economizar algumas instruções.
+; =========================================================================
+; Leitura do teclado.
+; IMPORTANTE: a leitura sempre é realizada dois bytes por vez!
+;
+0700 0000  ; Função que lê os bytes
+0702 D000  ; Lê dois bytes do teclado
+0704 9100  ; guarda em aux
+0706 60F8  ; multiplica por 100
+0708 70F8  ; divide por 100
+070A 50F0  ; subtrai 30
+070C 9102  ; escreve em num1
+070E 8100  ; Pega a entrada
+0710 70F8  ; Divide por 100
+0712 50F0  ; subtrai 30
+0714 60EE  ; Multiplica por A
+0716 9100  ; Salva em aux
+0718 8102  ; pega o num
+071A 4100  ; soma com as dezenas
+071C 9102  ; salva na variavel de saida 
+071E B700  ; retorno do programa
+;
+; Converte hexa para decimal
+;
+050C 0000  ; inicio da funcao
+050E 8104  ; pega o num
+0510 70EC  ; divide por 100
+0512 910A  ; salva em centenas
+0514 60EC  ; multiplica por 100
+0516 9100  ; salva em aux
+0518 8104  ; pega o num
+051A 5100  ; subtrai da centena
+051C 9104  ; escreve em num
+051E 70EE  ; divide por 10
+0520 9108  ; salva em dezenas
+0522 60EE  ; vezes 10
+0524 9100  ; salva em aux
+0526 8104  ; pega o num
+0528 5100  ; subtrai a dezena
+052A 9106  ; escreve em unidades
+052C B50C  ; fim
+; 
+;
+0800 A700  ; le o primeiro num
+0802 8102  ; load do num lido
+0804 90FA  ; salva em num1
+0806 D000  ; le os espaços
+0808 A700  ; le o segundo num
+080A 8102  ; carrega o num2 lido 
+080C 40FA  ; soma com num1
+080E 9104  ; salva em resposta hexa
+0810 A50C  ; chama a função para converter hexa pra decimal
+0812 810A  ; pega centena
+0814 181A  ; pula se zero
+0816 40F0  ; soma com 30
+0818 E100  ; imprime centena
+081A 8108  ; pega dezena
+081C 40F0  ; soma com 30
+081E E100  ; imprime dezena
+0820 8106  ; pega unidade
+0822 40F0  ; soma com 30
+0824 E100  ; imprime unidade
+0826 0200  ; fim do programa
+;
+0200 C200  ; The End.

@@ -1,0 +1,21 @@
+ATM
+Version of Hopcroft & Ullman's TM for {0^n 1^n : n > 0} with 2-way infinite tape
+0 1	// input alphabet, note such comments are permitted at the end of the line
+0 1 X Y B // tape alphabet
+1	// number of tapes
+1	// number of tracks on tape 0
+2	// tape 0 is 2-way infinite
+q0	// the initial state
+q4      // final state(s)
+q0  0  q1  X  R  // the transitions do not use "+" since there is only one track
+q0  Y  q3  Y  R
+q1  0  q1  0  R
+q1  1  q2  Y  L
+q1  Y  q1  Y  R
+q2  0  q2  0  L
+q2  X  q0  X  R
+q2  Y  q2  Y  L
+q3  Y  q3  Y  R
+q3  B  q4  B  R
+end 	//required
+

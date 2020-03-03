@@ -1,0 +1,17 @@
+ATM
+Hopcroft & Ullman's TM for {aw in (0 + 1)* | any a, a does not occur in w} = 01* + 10*
+0 1	// input alphabet
+0 1 B	// tape alphabet
+1	// number of tapes
+1	// number of tracks on tape 0
+2	// tape 0 is 2-way infinite
+[q0,B]	// the initial state
+[q1,B]	// the final state
+[q0,B]  0  [q1,0]  0  R  // the transitions do not use "+" since there is only one track
+[q0,B]  1  [q1,1]  1  R
+[q1,0]  1  [q1,0]  1  R
+[q1,1]  0  [q1,1]  0  R
+[q1,0]  B  [q1,B]  0  L
+[q1,1]  B  [q1,B]  0  L
+end
+

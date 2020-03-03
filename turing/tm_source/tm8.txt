@@ -1,0 +1,26 @@
+ATM
+{a^n b^n c^n : n > 0 }
+a b c   // input alphabet, note such comments are permitted at the end of the line
+a b c d B // tape alphabet
+4  // number of tapes
+1  // number of tracks on tape 0
+1  // number of tracks on tape 1
+1  // number of tracks on tape 2
+1  // number of tracks on tape 3
+1  // tape 0 is 1-way infinite
+1  // tape 1 is 1-way infinite
+1  // tape 2 is 1-way infinite
+1  // tape 3 is 1-way infinite
+q0	// the initial state
+q5 // final state
+q0 a+B+B+B q1 a+d+d+d s+r+r+r
+q1 a+B+B+B q1 a+a+B+B r+r+s+s
+q1 b+B+B+B q2 b+B+b+B r+s+r+s
+q2 b+B+B+B q2 b+B+b+B r+s+r+s
+q2 c+B+B+B q3 c+B+B+c r+s+s+r
+q3 c+B+B+B q3 c+B+B+c r+s+s+r
+q3 B+B+B+B q4 B+B+B+B s+l+l+l
+q4 B+a+b+c q4 B+a+b+c s+l+l+l
+q4 B+d+d+d q5 B+d+d+d s+r+r+r
+end 	//required
+
