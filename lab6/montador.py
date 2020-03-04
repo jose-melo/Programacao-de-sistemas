@@ -77,7 +77,13 @@ for linha in arq:
 		continue 
 	
 	if op == 'K':
-		saida.write(format(locationCounter, '#06x').upper()[2:] + ' ' + operando+'; Constante '+rotulo+'\n')
+		
+		if operando in TS:
+			operando = int(TS[operando])
+		else:
+			operando = int(operando, 16)
+		
+		saida.write(format(locationCounter, '#06x').upper()[2:] + ' ' + format(operando, '#06x').upper()[2:]+'; Constante '+rotulo+'\n')
 		locationCounter += 2
 		continue
 

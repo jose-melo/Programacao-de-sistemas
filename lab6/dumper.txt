@@ -1,3 +1,11 @@
+;Programa de Teste
+ @ /0000
+ K /0004
+A K /0002
+ LD A
+CABO HM CABO
+ SC IMAGEM
+END HM END
 ;*********************************
 ;Inicio do Programa
 ;*********************************
@@ -109,6 +117,7 @@ HEX2BIN K /0000
 LOOP2 LD PONTEIRO
  + MULT
  MM INSTR1
+ LD ENTRADAHEX2BIN
 INSTR1 K /0000
  / MIL
  SC CONVERTE
