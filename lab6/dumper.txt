@@ -1,0 +1,66 @@
+;*********************************
+;Inicio do Programa
+;*********************************
+;---------------------------------
+;Constantes e variáveis
+;---------------------------------
+ @ /700
+FINAL K /0006
+NPALAVRAS K /0000
+FALTAM K /0000
+ENDATUAL K /0000
+DISCO K /0300
+ENTRADAHEX2BIN K /0000
+BINARIO K /0000
+ K /0000
+ K /0000
+ K /0000
+;---------------------------------
+;Constantes da funcao Indexado
+;---------------------------------
+BASE K /0000
+IDX K /0000
+;---------------------------------
+;Constantes da funcao HEX2BIN
+;---------------------------------
+MIL K /1000
+CEM K /0100
+DEZ K /0010
+UM K /0001
+RESP K /0000
+COMECO K MIL
+PONTEIRO K /0000
+PARADA2 K RESP
+;---------------------------------
+;Constantes da funcao Converte
+;---------------------------------
+AUX K /0000
+DESLOC K /0001
+;---------------------------------
+;Constantes da funcao resto2
+;---------------------------------
+AUX1 K /0000
+AUX2 K /0000
+;---------------------------------
+;Constantes
+;---------------------------------
+PASSO K /0002
+ZERO K /0000
+DOIS K /0002
+LOAD K /8000
+MOVE K /9000
+MULT K /6000
+DIV K /7000
+CHECKSUM K /0000
+PARADA K /0004
+I K /0000
+;--------------------------------
+;Constantes da funcao IMPRIME
+;--------------------------------
+NIBBLE K /0000
+AUXIM K /0000
+SAIDAIMP K /0100
+ASCII K /3030
+;---------------------------------
+;Funcao IMAGEM
+;---------------------------------

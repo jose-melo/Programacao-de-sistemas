@@ -1,0 +1,7 @@
+;inicio do programa
+ @ /700
+INICIAL K /0000
+FINAL K /0006
+INI K /0000
+ LD INICIAL
+# INICIAL

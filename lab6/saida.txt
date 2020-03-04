@@ -1,0 +1,6 @@
+;inicio do programa
+
+0700 0000; Constante INICIAL
+0702 0006; Constante FINAL
+0704 0000; Constante INI
+0706 8700; LD INICIAL
