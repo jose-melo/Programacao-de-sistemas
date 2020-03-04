@@ -1,11 +1,12 @@
 ;Programa de Teste
- @ /0000
- K /0004
+ @ /0008
+ SC IMAGEM
+END HM END
+ @ /000C
+ K /888A
 A K /0002
  LD A
 CABO HM CABO
- SC IMAGEM
-END HM END
 ;*********************************
 ;Inicio do Programa
 ;*********************************
@@ -13,8 +14,8 @@ END HM END
 ;Constantes e variáveis
 ;---------------------------------
  @ /700
-INICIAL K /0000
-FINAL K /0006
+INICIAL K /000C
+FINAL K /0014
 NPALAVRAS K /0000
 FALTAM K /0000
 ENDATUAL K /0000
@@ -25,6 +26,9 @@ BINARIO K /0000
  K /0000
  K /0000
 SAIDA K /0000
+TEMP K /0000
+MAX K /FFFF
+QUINZE K /000F
 ;---------------------------------
 ;Constantes da funcao Indexado
 ;---------------------------------
@@ -119,8 +123,17 @@ LOOP2 LD PONTEIRO
  MM INSTR1
  LD ENTRADAHEX2BIN
 INSTR1 K /0000
+ JN NEGATIVO
  / MIL
- SC CONVERTE
+ JP TRATEI
+NEGATIVO MM TEMP
+ LD MAX
+ - TEMP
+ / MIL
+ MM TEMP
+ LD QUINZE
+ - TEMP
+TRATEI SC CONVERTE
  LD PONTEIRO
  - COMECO
  + BINARIO
