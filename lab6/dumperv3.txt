@@ -1,0 +1,313 @@
+;Programa de Teste
+ @ /0000
+ SC MAIN
+G HM G
+ @ /0010
+ K /888A
+ K /8181
+ JP PULO
+X K /0002
+Y K /0003
+Z K /0005
+PULO LD X
+ + Y
+ENCERROU HM ENCERROU
+ K /0000
+;*********************************
+;Inicio do Programa
+;*********************************
+;---------------------------------
+;Constantes e variáveis
+;---------------------------------
+ @ /700
+INICIAL K /0010
+FINAL K /001C
+NPALAVRAS K /0000
+FALTAM K /0000
+ENDATUAL K /0000
+DISCO K /0300
+ENTRADAHEX2BIN K /0000
+BINARIO K /0000
+ K /0000
+ K /0000
+ K /0000
+PONTEIROBINARIO K BINARIO
+SAIDA K /0000
+TEMP K /0000
+MAX K /FFFF
+QUINZE K /000F
+COMPRIMENTO K /0002
+COMPULTIMOBLOCO K /0000
+;---------------------------------
+;Constantes da funcao Indexado
+;---------------------------------
+BASE K /0000
+IDX K /0000
+;---------------------------------
+;Constantes da funcao HEX2BIN
+;---------------------------------
+MIL K /1000
+CEM K /0100
+DEZ K /0010
+UM K /0001
+RESP K /0000
+COMECO K MIL
+PONTEIRO K /0000
+PARADA2 K RESP
+;---------------------------------
+;Constantes da funcao Converte
+;---------------------------------
+AUX K /0000
+DESLOC K /0001
+;---------------------------------
+;Constantes da funcao resto2
+;---------------------------------
+AUX1 K /0000
+AUX2 K /0000
+;---------------------------------
+;Constantes
+;---------------------------------
+PASSO K /0002
+ZERO K /0000
+DOIS K /0002
+LOAD K /8000
+MOVE K /9000
+MULT K /6000
+DIV K /7000
+CHECKSUM K /0000
+PARADA K /0004
+I K /0000
+;--------------------------------
+;Constantes da funcao IMPRIME
+;--------------------------------
+NIBBLE K /0000
+AUXIM K /0000
+SAIDAIMP K /0100
+ASCII K /3030
+;---------------------------------
+; Função PRINCIPAL: DUMPER
+;---------------------------------
+ @ /0800
+MAIN K /0000
+ SC PREP
+WHILE LD FALTAM
+ JZ ULTBLOCO
+ SC METAINF
+ LD COMPRIMENTO
+ * DOIS
+ + ENDATUAL
+ MM FINAL
+ SC IMAGEM
+ SC CHECK
+ LD FALTAM
+ - UM
+ MM FALTAM
+ JP WHILE
+ULTBLOCO SC METAINF
+ LD COMPULTIMOBLOCO
+ * DOIS
+ + ENDATUAL
+ MM FINAL
+ SC IMAGEM
+ SC CHECK
+ HM MAIN
+;---------------------------------
+; Função PREP prepara a execução
+;---------------------------------
+PREP K /0000
+ LD INICIAL
+ MM ENDATUAL
+ LD FINAL
+ - INICIAL
+ / DOIS
+ MM NPALAVRAS
+ / COMPRIMENTO
+ MM FALTAM
+ * COMPRIMENTO
+ MM TEMP
+ LD NPALAVRAS
+ - TEMP
+ MM COMPULTIMOBLOCO
+ RS PREP
+;------------------------------------------------------------
+; Função METAINF gera código do comprimento e do end. inicial
+;------------------------------------------------------------
+METAINF K /0000
+ LV /000
+ MM CHECKSUM
+ LD ENDATUAL
+ MM ENTRADAHEX2BIN
+ + CHECKSUM
+ MM CHECKSUM
+ SC IMPRIME
+ LD FALTAM
+ JZ ARRUMAULTIMO
+ LD COMPRIMENTO
+ MM ENTRADAHEX2BIN
+ + CHECKSUM
+ MM CHECKSUM
+ SC IMPRIME
+ JP FINAL2
+ARRUMAULTIMO LD COMPULTIMOBLOCO
+ MM ENTRADAHEX2BIN
+ + CHECKSUM
+ MM CHECKSUM
+ SC IMPRIME
+FINAL2 RS METAINF
+;---------------------------------
+; Função CHECK gera o checksum
+;---------------------------------
+CHECK K /0000
+ LD CHECKSUM
+ MM ENTRADAHEX2BIN
+ SC IMPRIME
+ RS CHECK
+;---------------------------------
+;Funcao IMAGEM
+;---------------------------------
+IMAGEM K /0000
+LOOP LV /0000
+ MM IDX
+ LD ENDATUAL
+ - FINAL
+ JZ FIM
+ LD ENDATUAL
+ MM BASE
+ SC INDEXADO
+ MM ENTRADAHEX2BIN
+ + CHECKSUM
+ MM CHECKSUM
+ SC IMPRIME
+ LD ENDATUAL
+ + PASSO
+ MM ENDATUAL
+ JP LOOP
+FIM RS IMAGEM
+;---------------------------------------------
+;Função IMPRIMEBIM que grava no disco os bits
+;---------------------------------------------
+IMPRIMEBIN K /0000
+ LV /0003
+ MM IDX
+ LD PONTEIROBINARIO
+ MM BASE
+IMPRESSAO SC INDEXADO
+ MM SAIDA
+ SC IMPRIME
+ LD SAIDA
+ * CEM
+ SC IMPRIME
+ LD IDX
+ - UM
+ MM IDX
+ JN PROXIMO
+ JP IMPRESSAO
+PROXIMO RS IMPRIMEBIN
+;---------------------------------------------
+;Função HEX2BIN que converte hexa para binario
+;---------------------------------------------
+ @ /0900
+HEX2BIN K /0000
+ LD COMECO
+ MM PONTEIRO
+LOOP2 LD PONTEIRO
+ + MULT
+ MM INSTR1
+ LD ENTRADAHEX2BIN
+INSTR1 K /0000
+ JN NEGATIVO
+ / MIL
+ JP TRATEI
+NEGATIVO MM TEMP
+ LD MAX
+ - TEMP
+ / MIL
+ MM TEMP
+ LD QUINZE
+ - TEMP
+TRATEI SC CONVERTE
+ LD PONTEIRO
+ - COMECO
+ + PONTEIROBINARIO
+ + MOVE
+ MM INSTR2
+ LD RESP
+INSTR2 K /0000
+ LD PONTEIRO
+ + PASSO
+ MM PONTEIRO
+ - PARADA2
+ JZ FIM2
+ JP LOOP2
+FIM2 RS HEX2BIN
+;----------------------------------------------
+;Funcao CONVERTE que converte um nibble
+;----------------------------------------------
+CONVERTE K /0000
+ MM AUX
+ LD UM
+ MM DESLOC
+ LV /0000
+ MM RESP
+LOOP3 LD AUX
+ SC RESTO2
+ * DESLOC
+ + RESP
+ MM RESP
+ LD AUX
+ / DOIS
+ MM AUX
+ JZ FIM3
+ LD DESLOC
+ * DEZ
+ MM DESLOC
+ JP LOOP3
+FIM3 RS CONVERTE
+;----------------------------------------------
+;Funcao RESTO2 que calcula n mod 2
+;----------------------------------------------
+RESTO2 K /0000
+ MM AUX1
+ / DOIS
+ * DOIS
+ MM AUX2
+ LD AUX1
+ - AUX2
+ RS RESTO2
+;----------------------------------------------
+;Funcao INDEXADO que retorna base[idx]
+;----------------------------------------------
+INDEXADO K /0000
+ LD IDX
+ * DOIS
+ + BASE
+ + LOAD
+ MM INSTR7
+INSTR7 K /0000
+ RS INDEXADO
+;----------------------------------------------
+; Imprime em binário
+;----------------------------------------------
+IMPRIME K /0000
+ LD ENTRADAHEX2BIN
+ PD /300
+ + CHECKSUM
+ MM CHECKSUM
+ RS IMPRIME
+;----------------------------------------------
+;Funcao IMPRIME que grava no disco (.txt) a representação ascii do valor
+;----------------------------------------------
+IMPRIME2 K /0000
+ / CEM
+ MM AUXIM
+ / DEZ
+ * CEM
+ MM SAIDAIMP
+ LD AUXIM
+ * MIL
+ / MIL
+ + SAIDAIMP
+ + ASCII
+ PD /300
+ RS IMPRIME2
+# IMAGEM

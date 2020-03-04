@@ -1,0 +1,307 @@
+;Programa de Teste
+0000 A800; SC MAIN
+0002 C002; HM G
+0010 888A; Constante 
+0012 8181; Constante 
+0014 001C; JP PULO
+0016 0002; Constante X
+0018 0003; Constante Y
+001A 0005; Constante Z
+001C 8016; LD X
+001E 4018; + Y
+0020 C020; HM ENCERROU
+0022 0000; Constante 
+;*********************************
+;Inicio do Programa
+;*********************************
+;---------------------------------
+;Constantes e variáveis
+;---------------------------------
+0700 0010; Constante INICIAL
+0702 001C; Constante FINAL
+0704 0000; Constante NPALAVRAS
+0706 0000; Constante FALTAM
+0708 0000; Constante ENDATUAL
+070A 0300; Constante DISCO
+070C 0000; Constante ENTRADAHEX2BIN
+070E 0000; Constante BINARIO
+0710 0000; Constante 
+0712 0000; Constante 
+0714 0000; Constante 
+0716 070E; Constante PONTEIROBINARIO
+0718 0000; Constante SAIDA
+071A 0000; Constante TEMP
+071C FFFF; Constante MAX
+071E 000F; Constante QUINZE
+0720 0002; Constante COMPRIMENTO
+0722 0000; Constante COMPULTIMOBLOCO
+;---------------------------------
+;Constantes da funcao Indexado
+;---------------------------------
+0724 0000; Constante BASE
+0726 0000; Constante IDX
+;---------------------------------
+;Constantes da funcao HEX2BIN
+;---------------------------------
+0728 1000; Constante MIL
+072A 0100; Constante CEM
+072C 0010; Constante DEZ
+072E 0001; Constante UM
+0730 0000; Constante RESP
+0732 0728; Constante COMECO
+0734 0000; Constante PONTEIRO
+0736 0730; Constante PARADA2
+;---------------------------------
+;Constantes da funcao Converte
+;---------------------------------
+0738 0000; Constante AUX
+073A 0001; Constante DESLOC
+;---------------------------------
+;Constantes da funcao resto2
+;---------------------------------
+073C 0000; Constante AUX1
+073E 0000; Constante AUX2
+;---------------------------------
+;Constantes
+;---------------------------------
+0740 0002; Constante PASSO
+0742 0000; Constante ZERO
+0744 0002; Constante DOIS
+0746 8000; Constante LOAD
+0748 9000; Constante MOVE
+074A 6000; Constante MULT
+074C 7000; Constante DIV
+074E 0000; Constante CHECKSUM
+0750 0004; Constante PARADA
+0752 0000; Constante I
+;--------------------------------
+;Constantes da funcao IMPRIME
+;--------------------------------
+0754 0000; Constante NIBBLE
+0756 0000; Constante AUXIM
+0758 0100; Constante SAIDAIMP
+075A 3030; Constante ASCII
+;---------------------------------
+; Função PRINCIPAL: DUMPER
+;---------------------------------
+0800 0000; Constante MAIN
+0802 A82E; SC PREP
+0804 8706; LD FALTAM
+0806 181E; JZ ULTBLOCO
+0808 A84C; SC METAINF
+080A 8720; LD COMPRIMENTO
+080C 6744; * DOIS
+080E 4708; + ENDATUAL
+0810 9702; MM FINAL
+0812 A882; SC IMAGEM
+0814 A878; SC CHECK
+0816 8706; LD FALTAM
+0818 572E; - UM
+081A 9706; MM FALTAM
+081C 0804; JP WHILE
+081E A84C; SC METAINF
+0820 8722; LD COMPULTIMOBLOCO
+0822 6744; * DOIS
+0824 4708; + ENDATUAL
+0826 9702; MM FINAL
+0828 A882; SC IMAGEM
+082A A878; SC CHECK
+082C C800; HM MAIN
+;---------------------------------
+; Função PREP prepara a execução
+;---------------------------------
+082E 0000; Constante PREP
+0830 8700; LD INICIAL
+0832 9708; MM ENDATUAL
+0834 8702; LD FINAL
+0836 5700; - INICIAL
+0838 7744; / DOIS
+083A 9704; MM NPALAVRAS
+083C 7720; / COMPRIMENTO
+083E 9706; MM FALTAM
+0840 6720; * COMPRIMENTO
+0842 971A; MM TEMP
+0844 8704; LD NPALAVRAS
+0846 571A; - TEMP
+0848 9722; MM COMPULTIMOBLOCO
+084A B82E; RS PREP
+;------------------------------------------------------------
+; Função METAINF gera código do comprimento e do end. inicial
+;------------------------------------------------------------
+084C 0000; Constante METAINF
+084E 3000; LV 000
+0850 974E; MM CHECKSUM
+0852 8708; LD ENDATUAL
+0854 970C; MM ENTRADAHEX2BIN
+0856 474E; + CHECKSUM
+0858 974E; MM CHECKSUM
+085A A98A; SC IMPRIME
+085C 8706; LD FALTAM
+085E 186C; JZ ARRUMAULTIMO
+0860 8720; LD COMPRIMENTO
+0862 970C; MM ENTRADAHEX2BIN
+0864 474E; + CHECKSUM
+0866 974E; MM CHECKSUM
+0868 A98A; SC IMPRIME
+086A 0876; JP FINAL2
+086C 8722; LD COMPULTIMOBLOCO
+086E 970C; MM ENTRADAHEX2BIN
+0870 474E; + CHECKSUM
+0872 974E; MM CHECKSUM
+0874 A98A; SC IMPRIME
+0876 B84C; RS METAINF
+;---------------------------------
+; Função CHECK gera o checksum
+;---------------------------------
+0878 0000; Constante CHECK
+087A 874E; LD CHECKSUM
+087C 970C; MM ENTRADAHEX2BIN
+087E A98A; SC IMPRIME
+0880 B878; RS CHECK
+;---------------------------------
+;Funcao IMAGEM
+;---------------------------------
+0882 0000; Constante IMAGEM
+0884 3000; LV 0000
+0886 9726; MM IDX
+0888 8708; LD ENDATUAL
+088A 5702; - FINAL
+088C 18A4; JZ FIM
+088E 8708; LD ENDATUAL
+0890 9724; MM BASE
+0892 A97A; SC INDEXADO
+0894 970C; MM ENTRADAHEX2BIN
+0896 474E; + CHECKSUM
+0898 974E; MM CHECKSUM
+089A A98A; SC IMPRIME
+089C 8708; LD ENDATUAL
+089E 4740; + PASSO
+08A0 9708; MM ENDATUAL
+08A2 0884; JP LOOP
+08A4 B882; RS IMAGEM
+;---------------------------------------------
+;Função IMPRIMEBIM que grava no disco os bits
+;---------------------------------------------
+08A6 0000; Constante IMPRIMEBIN
+08A8 3003; LV 0003
+08AA 9726; MM IDX
+08AC 8716; LD PONTEIROBINARIO
+08AE 9724; MM BASE
+08B0 A97A; SC INDEXADO
+08B2 9718; MM SAIDA
+08B4 A98A; SC IMPRIME
+08B6 8718; LD SAIDA
+08B8 672A; * CEM
+08BA A98A; SC IMPRIME
+08BC 8726; LD IDX
+08BE 572E; - UM
+08C0 9726; MM IDX
+08C2 28C6; JN PROXIMO
+08C4 08B0; JP IMPRESSAO
+08C6 B8A6; RS IMPRIMEBIN
+;---------------------------------------------
+;Função HEX2BIN que converte hexa para binario
+;---------------------------------------------
+0900 0000; Constante HEX2BIN
+0902 8732; LD COMECO
+0904 9734; MM PONTEIRO
+0906 8734; LD PONTEIRO
+0908 474A; + MULT
+090A 990E; MM INSTR1
+090C 870C; LD ENTRADAHEX2BIN
+090E 0000; Constante INSTR1
+0910 2916; JN NEGATIVO
+0912 7728; / MIL
+0914 0924; JP TRATEI
+0916 971A; MM TEMP
+0918 871C; LD MAX
+091A 571A; - TEMP
+091C 7728; / MIL
+091E 971A; MM TEMP
+0920 871E; LD QUINZE
+0922 571A; - TEMP
+0924 A942; SC CONVERTE
+0926 8734; LD PONTEIRO
+0928 5732; - COMECO
+092A 4716; + PONTEIROBINARIO
+092C 4748; + MOVE
+092E 9932; MM INSTR2
+0930 8730; LD RESP
+0932 0000; Constante INSTR2
+0934 8734; LD PONTEIRO
+0936 4740; + PASSO
+0938 9734; MM PONTEIRO
+093A 5736; - PARADA2
+093C 1940; JZ FIM2
+093E 0906; JP LOOP2
+0940 B900; RS HEX2BIN
+;----------------------------------------------
+;Funcao CONVERTE que converte um nibble
+;----------------------------------------------
+0942 0000; Constante CONVERTE
+0944 9738; MM AUX
+0946 872E; LD UM
+0948 973A; MM DESLOC
+094A 3000; LV 0000
+094C 9730; MM RESP
+094E 8738; LD AUX
+0950 A96A; SC RESTO2
+0952 673A; * DESLOC
+0954 4730; + RESP
+0956 9730; MM RESP
+0958 8738; LD AUX
+095A 7744; / DOIS
+095C 9738; MM AUX
+095E 1968; JZ FIM3
+0960 873A; LD DESLOC
+0962 672C; * DEZ
+0964 973A; MM DESLOC
+0966 094E; JP LOOP3
+0968 B942; RS CONVERTE
+;----------------------------------------------
+;Funcao RESTO2 que calcula n mod 2
+;----------------------------------------------
+096A 0000; Constante RESTO2
+096C 973C; MM AUX1
+096E 7744; / DOIS
+0970 6744; * DOIS
+0972 973E; MM AUX2
+0974 873C; LD AUX1
+0976 573E; - AUX2
+0978 B96A; RS RESTO2
+;----------------------------------------------
+;Funcao INDEXADO que retorna base[idx]
+;----------------------------------------------
+097A 0000; Constante INDEXADO
+097C 8726; LD IDX
+097E 6744; * DOIS
+0980 4724; + BASE
+0982 4746; + LOAD
+0984 9986; MM INSTR7
+0986 0000; Constante INSTR7
+0988 B97A; RS INDEXADO
+;----------------------------------------------
+; Imprime em binário
+;----------------------------------------------
+098A 0000; Constante IMPRIME
+098C 870C; LD ENTRADAHEX2BIN
+098E E300; PD 300
+0990 474E; + CHECKSUM
+0992 974E; MM CHECKSUM
+0994 B98A; RS IMPRIME
+;----------------------------------------------
+;Funcao IMPRIME que grava no disco (.txt) a representação ascii do valor
+;----------------------------------------------
+0996 0000; Constante IMPRIME2
+0998 772A; / CEM
+099A 9756; MM AUXIM
+099C 772C; / DEZ
+099E 672A; * CEM
+09A0 9758; MM SAIDAIMP
+09A2 8756; LD AUXIM
+09A4 6728; * MIL
+09A6 7728; / MIL
+09A8 4758; + SAIDAIMP
+09AA 475A; + ASCII
+09AC E300; PD 300
+09AE B996; RS IMPRIME2
