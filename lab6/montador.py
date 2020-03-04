@@ -1,4 +1,4 @@
-orig = 'dumper.txt'
+orig = 'dumperv2.txt'
 dest = 'dumperV1.mvn'
 
 arq = open(orig, 'r')
