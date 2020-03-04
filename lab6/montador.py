@@ -1,4 +1,5 @@
 orig = 'dumper.txt'
+dest = 'dumperV1.mvn'
 
 arq = open(orig, 'r')
 TS = {}
@@ -31,7 +32,6 @@ for linha in arq:
 	if linha[0] == '#': continue	
 	
 	linha = linha.split(' ')
-	print(linha)
 
 	rotulo = linha[0]
 	op = linha[1]
@@ -40,7 +40,8 @@ for linha in arq:
 	if rotulo != '':
 		if rotulo not in TS:
 			TS[rotulo] = locationCounter
-	
+		else:
+			print("DEU MEEEERDA MERMAO: VOCE REPETIU UM ROTU")
 	if op == '@':
 		locationCounter = int(operando[1:-1], 16)
 		continue 
@@ -48,7 +49,7 @@ for linha in arq:
 
 arq.close()
 arq = open(orig, 'r')
-saida = open('saida.txt', 'w')
+saida = open(dest, 'w')
 
 locationCounter = 0x0000
 for linha in arq:
@@ -56,7 +57,6 @@ for linha in arq:
 	if linha[0] == ';':
 		for i in linha:
 			saida.write(i)
-		saida.write('\n')
 		continue
 	if linha[0] == '#': continue	
 
@@ -84,15 +84,15 @@ for linha in arq:
 	opp = operando
 	if operando in TS:
 		operando = int(TS[operando])
-
-	print("Operando = ", operando)
+	else:
+		operando = int(operando, 16)
+	#print("Operando = ", type(operando))
 
 	saida.write(format(locationCounter, '#06x').upper()[2:] + ' ' +TabInst[linha[1]] + format(operando, '#05x').upper()[2:]+'; '+linha[1]+' '+opp+'\n')
 	locationCounter += 2
 
 
 
-print(TS)
 saida.close()
 arq.close()
 

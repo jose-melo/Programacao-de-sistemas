@@ -5,6 +5,7 @@
 ;Constantes e variáveis
 ;---------------------------------
  @ /700
+INICIAL K /0000
 FINAL K /0006
 NPALAVRAS K /0000
 FALTAM K /0000
@@ -15,6 +16,7 @@ BINARIO K /0000
  K /0000
  K /0000
  K /0000
+SAIDA K /0000
 ;---------------------------------
 ;Constantes da funcao Indexado
 ;---------------------------------
@@ -64,3 +66,125 @@ ASCII K /3030
 ;---------------------------------
 ;Funcao IMAGEM
 ;---------------------------------
+ @ /0800
+IMAGEM K /0000
+ LD INICIAL
+ MM ENDATUAL
+LOOP LV /0000
+ MM IDX
+ LD ENDATUAL
+ MM BASE
+ SC INDEXADO
+ MM ENTRADAHEX2BIN
+ SC HEX2BIN
+ LV /0003
+ MM IDX
+ LD BINARIO
+ MM BASE
+IMPRESSAO SC INDEXADO
+ MM SAIDA
+ SC IMPRIME
+ LD SAIDA
+ * CEM
+ SC IMPRIME
+ LD IDX
+ - UM
+ MM IDX
+ JN PROXIMO
+ JP IMPRESSAO
+PROXIMO LD ENDATUAL
+ + PASSO
+ MM ENDATUAL
+ - FINAL
+ JZ FIM
+ JP LOOP
+FIM HM FIM
+;---------------------------------------------
+;Função HEX2BIN que converte hexa para binario
+;---------------------------------------------
+ @ /0900
+HEX2BIN K /0000
+ LD COMECO
+ MM PONTEIRO
+LOOP2 LD PONTEIRO
+ + MULT
+ MM INSTR1
+INSTR1 K /0000
+ / MIL
+ SC CONVERTE
+ LD PONTEIRO
+ - COMECO
+ + BINARIO
+ + MOVE
+ MM INSTR2
+ LD RESP
+INSTR2 K /0000
+ LD PONTEIRO
+ + PASSO
+ MM PONTEIRO
+ - PARADA2
+ JZ FIM2
+ JP LOOP2
+FIM2 RS HEX2BIN
+;----------------------------------------------
+;Funcao CONVERTE que converte um nibble
+;----------------------------------------------
+CONVERTE K /0000
+ MM AUX
+ LD UM
+ MM DESLOC
+ LV /0000
+ MM RESP
+LOOP3 LD AUX
+ SC RESTO2
+ * DESLOC
+ + RESP
+ MM RESP
+ LD AUX
+ / DOIS
+ MM AUX
+ JZ FIM3
+ LD DESLOC
+ * DEZ
+ MM DESLOC
+ JP LOOP3
+FIM3 RS CONVERTE
+;----------------------------------------------
+;Funcao RESTO2 que calcula n mod 2
+;----------------------------------------------
+RESTO2 K /0000
+ MM AUX1
+ / DOIS
+ * DOIS
+ MM AUX2
+ LD AUX1
+ - AUX2
+ RS RESTO2
+;----------------------------------------------
+;Funcao INDEXADO que retorna base[idx]
+;----------------------------------------------
+INDEXADO K /0000
+ LD IDX
+ * DOIS
+ + BASE
+ + LOAD
+ MM INSTR7
+INSTR7 K /0000
+ RS INDEXADO
+;----------------------------------------------
+;Funcao IMPRIME que grava no disco (.txt) a representação ascii do valor
+;----------------------------------------------
+IMPRIME K /0000
+ / CEM
+ MM AUXIM
+ / DEZ
+ * CEM
+ MM SAIDAIMP
+ LD AUXIM
+ * MIL
+ / MIL
+ + SAIDAIMP
+ + ASCII
+ PD /300
+ RS IMPRIME
+# IMAGEM
