@@ -285,9 +285,9 @@
 ;----------------------------------------------
 098A 0000; Constante IMPRIME
 098C 870C; LD ENTRADAHEX2BIN
-098E E300; PD 300
-0990 474E; + CHECKSUM
-0992 974E; MM CHECKSUM
+098E 474E; + CHECKSUM
+0990 974E; MM CHECKSUM
+0992 E300; PD 300
 0994 B98A; RS IMPRIME
 ;----------------------------------------------
 ;Funcao IMPRIME que grava no disco (.txt) a representação ascii do valor

@@ -290,9 +290,9 @@ INSTR7 K /0000
 ;----------------------------------------------
 IMPRIME K /0000
  LD ENTRADAHEX2BIN
- PD /300
  + CHECKSUM
  MM CHECKSUM
+ PD /300
  RS IMPRIME
 ;----------------------------------------------
 ;Funcao IMPRIME que grava no disco (.txt) a representação ascii do valor

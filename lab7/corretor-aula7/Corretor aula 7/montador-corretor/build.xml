@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="montador-corretor">
+  <target name="compile">
+    <mkdir dir="build"/>
+    <javac srcdir="src" destdir="build"/>
+  </target>
+</project>

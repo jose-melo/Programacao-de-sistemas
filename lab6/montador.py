@@ -1,5 +1,5 @@
-orig = 'dumperv3.txt'
-dest = 'dumperV3.mvn'
+orig = 'pilha.txt'
+dest = 'pilha.mvn'
 
 arq = open(orig, 'r')
 TS = {}

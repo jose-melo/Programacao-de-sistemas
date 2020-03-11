@@ -1,0 +1,65 @@
+; ----------------------------------------------------------------------------
+; Exemplo de programa escrito na linguagem de montagem da MVN
+; Refer�ncia da linguagem:
+; http://disciplinas.stoa.usp.br/mod/resource/view.php?id=378532
+; ----------------------------------------------------------------------------
+
+0000 0214		;	    JP INICIO      ; Jump incondicional para o in�cio
+
+				;	@   /100           ; Define que o endere�o agora �: 0x100
+0100 0100		;	C0  K  /100        ; Declara uma constante chamada C0 com valor 0x100
+0102 0111		;	C1  K  /111        ; Declara outra constante, e etc.
+0104 0122		;	C2  K  /122
+0106 0133		;	C3  K  /133
+0108 0144		;	C4  K  /144
+010a 0155		;	C5  K  /155
+010c 0166		;	C6  K  /166
+010e 0177		;	C7  K  /177
+0110 0188		;	C8  K  /188
+0112 0199		;	C9  K  /199
+0114 01aa		;	CA  K  /1AA
+0116 01bb		;	CB  K  /1BB
+0118 01cc		;	CC  K  /1CC
+011a 01dd		;	CD  K  /1DD
+011c 01ee		;	CE  K  /1EE
+011e 01ff		;	CF  K  /1FF
+
+; Exemplos de declara��o de constantes em diferentes formatos:
+
+0120 4552		;	GG  K  'ER         ; Base 256 (valor = 'E'*256^1 + 'R'*256^0)
+0122 524f		;	GH  K  'RO         ; Base 256
+0124 03e8		;	GJ  K  =1000       ; Base 10 (1000 em decimal)
+0126 03e8		;	GK  K  /3E8        ; Base 16 (equivalente a 0x3E8)
+0128 03e8		;	GL  K  @1750       ; Base 8
+012a 03e8		;	G�  K  #1111101000 ; Base 2 (1111101000 em bin�rio)
+
+				;	@   /200           ; Define que o endere�o agora �: 0x200
+0200 0000		;	$   /A             ; Reserva 10 words   0
+0202 0000		;	$   /A             ; Reserva 10 words   2
+0204 0000		;	$   /A             ; Reserva 10 words   4
+0206 0000		;	$   /A             ; Reserva 10 words   6
+0208 0000		;	$   /A             ; Reserva 10 words   8
+020a 0000		;	$   /A             ; Reserva 10 words   a
+020c 0000		;	$   /A             ; Reserva 10 words   c
+020e 0000		;	$   /A             ; Reserva 10 words   e
+0210 0000		;	$   /A             ; Reserva 10 words   10
+0212 0000		;	$   /A             ; Reserva 10 words   12
+				;	$   /A             ; Reserva 10 words
+
+0214 0100		;	INICIO JP C0       ; Come�o do programa
+0216 1102		;	       JZ C1       ; Exemplo de uso de todos os mnem�nicos da linguagem
+0218 2104		;	       JN C2
+021a 3106		;	       LV C3
+021c 4108		;	       +  C4
+021e 510a		;	       -  C5
+0220 610c		;	       *  C6
+0222 710e		;	       /  C7
+0224 8110		;	       LD C8
+0226 9112		;	       MM C9
+0228 a114		;	       SC CA
+022a b116		;	       RS CB
+022c c118		;	       HM CC
+022e d11a		;	       GD CD
+0230 e11c		;	       PD CE
+0232 f11e		;	       OS CF
+
