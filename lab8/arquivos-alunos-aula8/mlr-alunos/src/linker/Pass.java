@@ -210,6 +210,7 @@ public abstract class Pass {
 
                 // pegando o nibble e o endereço
                 temp = tokens.nextToken();
+         
                 if (temp.length() != 4) {
                     // endereço inadequado
                     linkErrorMessage = MSG_ENDERECO;

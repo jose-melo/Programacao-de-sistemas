@@ -19,7 +19,7 @@ public class SymbolTable {
 	
 	
 	/**Map que guarda os símbolos.*/
-	protected Map<String,String> symbolTable;
+	public Map<String,String> symbolTable;
 	
 	
 	public SymbolTable(){

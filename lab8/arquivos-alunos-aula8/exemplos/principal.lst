@@ -1,0 +1,35 @@
+; -------------------------------------------------------------------
+; Módulo "principal".
+;
+; Este é o módulo "principal", que contém o programa principal e
+; chamará o módulo "somador" (que está no arquivo somador.asm).
+; -------------------------------------------------------------------
+
+; Declaração de símbolos externos (importados por este módulo)
+; -------------------------------------------------------------------
+4000 0000 ; "SOMADOR<"		;	SOMADOR <                ; SOMADOR é um símbolo externo, i.e., está
+                         ; definido em algum outro módulo.
+4001 0000 ; "ENTRADA1<"		;	ENTRADA1 <               ; ENTRADA1 também é um símbolo externo.
+4002 0000 ; "ENTRADA2<"		;	ENTRADA2 <               ; ENTRADA2 também é um símbolo externo.
+
+; Declaração de símbolos 'públicos' (exportados por este módulo)
+; -------------------------------------------------------------------
+0006 0000 ; "SAIDA>"		;	SAIDA >                  ; SAIDA é um "entry point", ou um símbolo que
+                         ; está sendo exportado (i.e., outros módulo
+                         ; poderão chamar este código.)
+
+; Início do programa
+; -------------------------------------------------------------------
+
+				;	        @   /0000           ; Origem absoluta: 0x000
+0000 0008		;	        JP  INICIO          ; Pula para o início.
+0002 0050		;	VALOR1  K   /50             ; Constante: 0x50 (1a. parcela da soma)
+0004 00fa		;	VALOR2  K   /FA             ; Constante: 0xFA (2a. parcela da soma)
+0006 0000		;	SAIDA   K   /0000           ; Posição de memória para armazenar o valor da soma.
+
+0008 8002		;	INICIO  LD  VALOR1          ; Carrega a 1a. parcela da soma
+500a 9001		;	        MM  ENTRADA1        ; Armazena como argumento para o somador.
+000c 8004		;	        LD  VALOR2          ; Carrega a 2a. parcela da soma.
+500e 9002		;	        MM  ENTRADA2        ; Armazena como argumento para o somador.
+5010 a000		;	        SC  SOMADOR         ; Chama o somador (chamada de sub-rotina).
+0012 c000		;	        HM  /00             ; Finaliza execução.

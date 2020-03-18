@@ -86,6 +86,7 @@ public class Pass1 extends Pass {
 	    	  		addressInt += base;
 	    	  		address = Integer.toHexString(addressInt);		
 	    	  	}	    		
+	    		
 	    		symbolTable.setSymbolValue(symbol, address);
 	    		if(isRelocableEntryPoint(nibble))
 	        		symbolTable.setSymbolValue(symbol, address, true);

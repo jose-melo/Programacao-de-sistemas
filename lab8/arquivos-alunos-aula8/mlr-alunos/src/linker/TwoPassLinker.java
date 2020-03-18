@@ -3,6 +3,7 @@ package linker;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Representa um linker de dois passos. 
@@ -29,6 +30,12 @@ public class TwoPassLinker extends AbstractLinker {
         if (executePass(passo1)) {
             try {
                 // passo 1 com sucesso, executa o passo 2
+            	System.out.println("PASSO 1 realizado com sucesso!");
+            	
+            	/*for (Map.Entry<String,String> entry : ((Pass1) passo1).getSymbolTable().symbolTable.entrySet())  
+                    System.out.println("Key = " + entry.getKey() + 
+                                     ", Value = " + entry.getValue()); */
+            	
                 passo2 = new Pass2(((Pass1) passo1).getSymbolTable(), outputFile);
                 if (executePass(passo2)) {
                     System.out.println(MSG_PASS2_OK);
@@ -64,7 +71,6 @@ public class TwoPassLinker extends AbstractLinker {
             for (int i = 0; i < inputFile.length; i++) {
                 filIn = new BufferedReader(new FileReader(inputFile[i]));
                 int linhaComErro = pass.tokenizeData(filIn, inputFile[i]);
-
                 if (linhaComErro == 0) {
                     // sem erros no passo
                     resultado = true;

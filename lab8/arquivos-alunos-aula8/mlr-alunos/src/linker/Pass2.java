@@ -59,35 +59,42 @@ public class Pass2 extends Pass {
          */
     	int addressInt;
     	int codeInt;
-    	boolean isResolved = true;
-    	String temp;
+      	boolean isResolved = true;
+    	String temp, aux = code;
     	
 
-  		addressInt = Integer.parseInt(address, 16);
     	
     	codeInt = Integer.parseInt(code, 16);    	
     	
   	   	if(nibble == 5 || nibble == 13) {
     		//Pendência externa
     		temp = symbolTable.getAddressByCode(currentFile, Integer.parseInt(code.substring(1)));
-    		if(temp == null)
+    		if(temp == "") {
     			isResolved = false;
-    		else
-    			address = temp;
+  	   		}else {
+  	   			temp = "0000" + temp;
+  	   			temp = temp.substring(temp.length() - 3, temp.length());
+    			code = code.charAt(0) + temp;
+    		
+    		}
     	}else if(isArgumentRelocable(nibble)) {
 	  		codeInt += base;
 	      	code = Integer.toHexString(codeInt);
 	  	}  	
-    	
+
+  		addressInt = Integer.parseInt(address, 16);
 	  	 if(isRelocable(nibble)) {
 	  		addressInt += base;
 	  		address = Integer.toHexString(addressInt);		
 	  	}
 	  
-  	   	out.write(addressInt, code, isRelocable(nibble), isArgumentRelocable(nibble), isResolved);
-    	
-    	
-        return false;
+	  	 
+	 	if(nibble == 5 || nibble == 13) 
+	 		out.write(addressInt, code, isRelocable(nibble), symbolTable.isRelocable(symbolTable.getSymbol(currentFile, Integer.parseInt(aux.substring(1)))), isResolved);
+	 	else
+	 		out.write(addressInt, code, isRelocable(nibble), isArgumentRelocable(nibble), isResolved);
+	 	
+        return true;
 
     }//method
 
@@ -111,23 +118,24 @@ public class Pass2 extends Pass {
     	
 	  	addressInt = Integer.parseInt(address, 16);
     	
-    	if(isRelocable(nibble)) {
+    	/*if(isRelocable(nibble)) {
  	  		addressInt += base;
  	  		address = Integer.toHexString(addressInt);		
- 	  	}
+ 	  	}*/
     	
     	if(isEntryPoint(nibble)) {
-    		out.write(addressInt, "0000", isRelocable(nibble), isArgumentRelocable(nibble), true);
-    		
+    		//out.write(addressInt, "0000", isRelocable(nibble), isArgumentRelocable(nibble), true);
+    		out.writeExternal(Integer.toString(nibble),addressInt, originalLine);
+			
     	}else if(isExternalPseudoInstruction(nibble)) {
     		
-    		if(nibble == 4) {
+    		if(symbolTable.getAddressByCode(currentFile, Integer.parseInt(address.substring(1))) == "") {
     			out.writeExternal(Integer.toString(nibble), externalCounter, originalLine);
     			externalCounter += 1;
     		}
     	}
     	
-        return false;
+        return true;
     }
 
     /**
