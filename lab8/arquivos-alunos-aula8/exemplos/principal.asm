@@ -21,7 +21,7 @@ SAIDA >                  ; SAIDA é um "entry point", ou um símbolo que
 ; Início do programa
 ; -------------------------------------------------------------------
 
-        @   /0000           ; Origem absoluta: 0x000
+        &   /0000           ; Origem absoluta: 0x000
         JP  INICIO          ; Pula para o início.
 VALOR1  K   /50             ; Constante: 0x50 (1a. parcela da soma)
 VALOR2  K   /FA             ; Constante: 0xFA (2a. parcela da soma)

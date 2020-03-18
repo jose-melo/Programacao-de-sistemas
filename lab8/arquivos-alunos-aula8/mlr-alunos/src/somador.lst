@@ -1,0 +1,31 @@
+; -------------------------------------------------------------------
+; Módulo "somador".
+;
+; Este é o módulo "somador", que contém uma sub-rotina que recebe duas
+; entradas, nas posições ENTRADA1 e ENTRADA2, e coloca o resultado da
+; soma na posição SAIDA.
+; -------------------------------------------------------------------
+
+; Declaração de símbolos externos (importados por este módulo)
+; -------------------------------------------------------------------
+4000 0000 ; "SAIDA<"		;	SAIDA <
+
+; Declaração de símbolos 'públicos' (exportados por este módulo)
+; -------------------------------------------------------------------
+2004 0000 ; "SOMADOR>"		;	SOMADOR >
+2000 0000 ; "ENTRADA1>"		;	ENTRADA1 >
+2002 0000 ; "ENTRADA2>"		;	ENTRADA2 >
+
+; Início do código
+; -------------------------------------------------------------------
+
+				;	         & /0000      ; Origem relocável
+
+8000 0000		;	ENTRADA1 K /0000      ; 1o. parâmetro da sub-rotina.
+8002 0000		;	ENTRADA2 K /0000      ; 2o. parâmetro da sub-rotina.
+
+8004 0000		;	SOMADOR  JP /000      ; Ponto de entrada da sub-rotina.
+a006 8000		;	         LD ENTRADA1  ; Carrega 1o. paramêtro.
+a008 4002		;	         +  ENTRADA2  ; Soma com o 2o. parâmetro.
+d00a 9000		;	         MM SAIDA     ; Armazena na variável SAIDA.
+a00c b004		;	         RS SOMADOR   ; Retorna da sub-rotina.
