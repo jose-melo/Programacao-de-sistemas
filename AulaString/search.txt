@@ -1,0 +1,75 @@
+;-------------------------------
+;Constantes e Variáveis
+;-------------------------------
+ @ /0000
+ SC COUNTS
+ LD RESULTADO
+ + ASCII
+ PD /100
+FIM HM FIM
+;
+;
+;
+ @ /0400
+I K /0000
+ASCII K /3030
+PSTR_PROC K STR_PROC
+PUTDISC K /D300
+MENOS K /5000
+UM K /0001
+DOIS K /0002
+PASSO K /0002
+LOAD K /8000
+COUNTS_UL K /0001
+RESULTADO K /0000
+UL K /0001
+STR_PROC K /7275
+ K /6E20
+ K /0000
+;---------------------
+;Função Principal COUNTS
+;-------------------
+ @ /0B00
+COUNTS K /0000
+INI SC CARREGA
+ JZ INCREMENTA
+ SC MONTALEITURA
+ MM INST1
+ LD PSTR_PROC
+ + I
+ + MENOS
+ MM INST2
+INST1 K /0000
+ JZ ACABOU
+INST2 K /0000
+ JZ PROX
+RESTART LV /0000
+ MM I
+ JP INI
+INCREMENTA LD RESULTADO
+ + UM
+ MM RESULTADO
+ JP RESTART
+PROX LD I
+ + PASSO
+ MM I
+ JP INI
+ACABOU RS COUNTS
+;------------------------------------
+;Funcao MontaLeitura
+;------------------------------------
+ @ /0300
+MONTALEITURA K /0000
+ LD COUNTS_UL
+ + PUTDISC
+ RS MONTALEITURA
+;------------------------------------
+;Função Carrega
+;-----------------------------------
+CARREGA K /0000
+ LD PSTR_PROC
+ + I
+ + LOAD
+ MM INST4
+INST4 K /0000
+ RS CARREGA

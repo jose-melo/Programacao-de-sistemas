@@ -1,0 +1,71 @@
+;-------------------------------
+;Constantes e Variáveis
+;-------------------------------
+0000 AB00; SC COUNTS
+0002 8414; LD RESULTADO
+0004 4402; + ASCII
+0006 E100; PD 100
+0008 C008; HM FIM
+;
+;
+;
+0400 0000; Constante I
+0402 3030; Constante ASCII
+0404 0418; Constante PSTR_PROC
+0406 D300; Constante PUTDISC
+0408 5000; Constante MENOS
+040A 0001; Constante UM
+040C 0002; Constante DOIS
+040E 0002; Constante PASSO
+0410 8000; Constante LOAD
+0412 0001; Constante COUNTS_UL
+0414 0000; Constante RESULTADO
+0416 0001; Constante UL
+0418 7275; Constante STR_PROC
+041A 6E20; Constante 
+041C 0000; Constante 
+;---------------------
+;Função Principal COUNTS
+;-------------------
+0B00 0000; Constante COUNTS
+0B02 A308; SC CARREGA
+0B04 1B20; JZ INCREMENTA
+0B06 A300; SC MONTALEITURA
+0B08 9B12; MM INST1
+0B0A 8404; LD PSTR_PROC
+0B0C 4400; + I
+0B0E 4408; + MENOS
+0B10 9B16; MM INST2
+0B12 0000; Constante INST1
+0B14 1B30; JZ ACABOU
+0B16 0000; Constante INST2
+0B18 1B28; JZ PROX
+0B1A 3000; LV 0000
+0B1C 9400; MM I
+0B1E 0B02; JP INI
+0B20 8414; LD RESULTADO
+0B22 440A; + UM
+0B24 9414; MM RESULTADO
+0B26 0B1A; JP RESTART
+0B28 8400; LD I
+0B2A 440E; + PASSO
+0B2C 9400; MM I
+0B2E 0B02; JP INI
+0B30 BB00; RS COUNTS
+;------------------------------------
+;Funcao MontaLeitura
+;------------------------------------
+0300 0000; Constante MONTALEITURA
+0302 8412; LD COUNTS_UL
+0304 4406; + PUTDISC
+0306 B300; RS MONTALEITURA
+;------------------------------------
+;Função Carrega
+;-----------------------------------
+0308 0000; Constante CARREGA
+030A 8404; LD PSTR_PROC
+030C 4400; + I
+030E 4410; + LOAD
+0310 9312; MM INST4
+0312 0000; Constante INST4
+0314 B308; RS CARREGA
