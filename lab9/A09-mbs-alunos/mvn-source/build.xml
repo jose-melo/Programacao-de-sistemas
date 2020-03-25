@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="mvn-source">
+  <target name="compile">
+    <mkdir dir="build"/>
+    <javac srcdir="src" destdir="build"/>
+  </target>
+</project>

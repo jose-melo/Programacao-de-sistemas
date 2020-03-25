@@ -1,0 +1,9 @@
+;
+; Programa de teste para a instrução OS, sub-instrução EE, código 00.
+;
+
+0000 0004 ; Jump para início
+0002 0000 ; Código da situação
+0004 8002 ; Carrega o código no acumulador
+0006 F0EE ; Invoca instrução OS
+0008 C008 ; The end.
