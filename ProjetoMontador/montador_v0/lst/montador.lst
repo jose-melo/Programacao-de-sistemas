@@ -1,0 +1,255 @@
+
+; ===================================================================
+; ADICIONAR CABEÇALHO _AQUI_
+; ===================================================================
+; ASMB -- MONTADOR PARA A MVN - ©JJN/2005 ©DLS&LGC/2018
+; ===================================================================
+; 
+; SIMBOLOS IMPORTADOS
+
+4000 0000 ; "HEXBIN<"		;	HEXBIN      <
+4001 0000 ; "DECBIN<"		;	DECBIN      <
+4002 0000 ; "OCTBIN<"		;	OCTBIN      <
+4003 0000 ; "BINHEX<"		;	BINHEX      <
+4004 0000 ; "BINBIN<"		;	BINBIN      <
+4005 0000 ; "CONV<"		;	CONV        <
+4006 0000 ; "IC<"		;	IC          <
+4007 0000 ; "AUX<"		;	AUX         <
+4008 0000 ; "AUX1<"		;	AUX1        <
+4009 0000 ; "LD<"		;	LD          <
+4010 0000 ; "MM<"		;	MM          <
+4011 0000 ; "CHAR2<"		;	CHAR2       <
+4012 0000 ; "LINHA<"		;	LINHA       <
+4013 0000 ; "LINHA2<"		;	LINHA2      <
+4014 0000 ; "CRLF<"		;	CRLF        <
+4015 0000 ; "LF<"		;	LF          <
+4016 0000 ; "PLINHA<"		;	PLINHA      <
+4017 0000 ; "BLANK<"		;	BLANK       <
+4018 0000 ; "OPERAND<"		;	OPERAND     <
+4019 0000 ; "MNEM<"		;	MNEM        <
+4020 0000 ; "OPCODE<"		;	OPCODE      <
+4021 0000 ; "MTOC<"		;	MTOC        <
+4022 0000 ; "ORIGEM<"		;	ORIGEM      <
+4023 0000 ; "FIM<"		;	FIM         <
+4024 0000 ; "RT<"		;	RT          <
+4025 0000 ; "RTOP<"		;	RTOP        <
+4026 0000 ; "ER<"		;	ER          <
+4027 0000 ; "RO<"		;	RO          <
+4028 0000 ; "COLLONB<"		;	COLLONB     <
+4029 0000 ; "ULTIMO<"		;	ULTIMO      <
+4030 0000 ; "PTS<"		;	PTS         <
+4031 0000 ; "MAXSIMB<"		;	MAXSIMB     <
+4032 0000 ; "DUPDEF<"		;	DUPDEF      <
+4033 0000 ; "OP<"		;	OP          <  
+4034 0000 ; "SPC2<"		;	SPC2        <
+4035 0000 ; "SPCPV<"		;	SPCPV       <
+4036 0000 ; "MAXBYTES<"		;	MAXBYTES    <
+
+4037 0000 ; "B1<"		;	B1          <
+4038 0000 ; "B2<"		;	B2          < 
+4039 0000 ; "H0<"		;	H0          <
+4040 0000 ; "H1<"		;	H1          <
+4041 0000 ; "H2<"		;	H2          <
+4042 0000 ; "H4<"		;	H4          <
+4043 0000 ; "H6<"		;	H6          <
+4044 0000 ; "H100<"		;	H100        <
+4045 0000 ; "H3FFE<"		;	H3FFE       < ;_AQUI_ ADICIONADO MAS NÃO HAVIA
+4046 0000 ; "H4000<"		;	H4000       < ;_AQUI_ ADICIONADO MAS NÃO HAVIA
+4047 0000 ; "H9000<"		;	H9000       < ;_AQUI_ ADICIONADO MAS NÃO HAVIA
+4048 0000 ; "HFF00<"		;	HFF00       <
+4049 0000 ; "HFFFF<"		;	HFFFF       <
+4050 0000 ; "HD<"		;	HD          <
+
+;_AQUI_ NOVAS VARIÁVEIS EXPORTADAS E MONTA2 IMPORTADO
+4051 0000 ; "MONTA1<"		;	MONTA1      <
+4052 0000 ; "MONTA2<"		;	MONTA2      < ; FUNÇÃO QUE MONTA O PASSO2
+0200 0000 ; "ASMB>"		;	ASMB        >
+029e 0000 ; "ERRO>"		;	ERRO        >
+021a 0000 ; "FIMASMB>"		;	FIMASMB     >
+027a 0000 ; "UNPACK>"		;	UNPACK      >
+
+; ===================================================================
+; AREA DE DADOS DA FUNCAO READLINE
+4053 0000 ; "WORD<"		;	WORD        <
+4054 0000 ; "ISB<"		;	ISB         <
+4055 0000 ; "COMMENT<"		;	COMMENT     <
+4056 0000 ; "P1END<"		;	P1END       <
+4057 0000 ; "PARG<"		;	PARG        <
+4058 0000 ; "ARGCNT<"		;	ARGCNT      <
+4059 0000 ; "PARG1<"		;	PARG1       <
+4060 0000 ; "PARG2<"		;	PARG2       <
+4061 0000 ; "PARG3<"		;	PARG3       <
+4062 0000 ; "EOL<"		;	EOL         <
+4063 0000 ; "EOF<"		;	EOF         <
+4064 0000 ; "STI<"		;	STI         <
+4065 0000 ; "STE<"		;	STE         <
+4066 0000 ; "PST<"		;	PST         <
+4067 0000 ; "ADDRI<"		;	ADDRI       <
+
+
+
+;** OUTRAS CONSTANTES NÃO DEFINIDAS PELO PROFESSOR***
+0000 4553		;	ETS         K     'ES
+0002 4558		;	EP          K     'EX
+
+0004 0000		;	TPEND+6     K   /0000 ; < ;_AQUI_ ADICIONADO MAS NÃO HÁ
+0006 0000		;	LDTPEND     K   /0000 ; LD + TPEND
+0008 0000		;	CI          K   /0000 ; ???
+000a 0000		;	MMTLINKS    K   /0000 ; ???
+000c 0000		;	LDLINKS     K   /0000 ; ???
+000e 0000		;	LDTS        K   /0000 ; ???
+0010 0000		;	ND          K   /0000 ; ???
+0012 0000		;	LAST        K   /0000 ; ???
+
+; ===================================================================
+; ===================================================================
+; MONTADOR -- PROGRAMA PRINCIPAL - ©JJN/2005
+;
+				;	              @     /0200
+5200 8039		;	     ASMB     LD    H0        ; POSICIONA ENDEREÇO EM ZERO
+5202 9006		;	              MM    IC        ; PARA GERAR CÓDIGO
+0204 3000		;	    PASSO1    LV    /0000
+0206 921c		;	              MM    UL
+0208 a21e		;	              SC    READLINE  ; LÊ PRÓXIMA LINHA
+520a a051		;	              SC    MONTA1    ; MONTA A LINHA LIDA E GERA O ENDEREÇO DO RÓTULO
+520c 8056		;	              LD    P1END     ; CHECA EOF
+020e 1204		;	              JZ    PASSO1    ;
+
+0210 3001		;	    PASSO2    LV    /0001
+0212 921c		;	              MM    UL
+0214 a21e		;	              SC    READLINE  ; LÊ PRÓXIMA LINHA
+5216 a052		;	              SC    MONTA2    ; MONTA O CÓDIGO E O SALVA NO ARQUIVO ESPECIFICADO NA UNIDADE LÓGICA 2
+            ; SC    CHECKE    ; CHECA EXCECAO DE EXCESSO DE LEITURA E EOF
+0218 1210		;	              JZ    PASSO2
+
+021a c21a		;	FIMASMB       HM    FIMASMB   ; TÉRMINO DO PROGRAMA
+
+
+; ===================================================================
+; READLINE -- LÊ UMA LINHA DE CÓDIGO-FONTE NO DISCO - ©JJN/2005
+021c 0000		;	     UL       K    /0000    ; UNIDADE LÓGICA DE ONDE SE LÊ
+021e 0000		;	     READLINE $    /0001    ; PONTO DE ENTRADA DE READLINE   0
+				;	     READLINE $    /0001    ; PONTO DE ENTRADA DE READLINE
+0220 3300		;	              LV   /0300    ; MONTA A INSTRUÇÃO DE LEITURA
+0222 421c		;	              +    UL
+5224 4050		;	              +    HD   ; 
+0226 9228		;	              MM   READ 
+0228 0000		;	     READ     $    /0001    ; LÊ DA UNIDADE LÓGICA ESPECIFICADA   0
+				;	     READ     $    /0001    ; LÊ DA UNIDADE LÓGICA ESPECIFICADA
+522a 9053		;	              MM   WORD     ; GUARDA LEITURA
+            
+
+; ===================================================================
+; CHK -- SEQUENCIA DE SUB-ROTINAS QUE VERIFICAM BRANCO, COMENTARIO, EOL E EOF EM B1
+
+522c 5017		;	      CHKB    -  BLANK      ; CHECA BRANCO
+022e 1246		;	              JZ ISBLANK    ;
+5230 8053		;	      CHKC    LD WORD       ; CHECA COMENTARIO
+5232 5055		;	              -  COMMENT    ;
+0234 1260		;	              JZ FIMREAD    ;
+5236 8053		;	      CHKEOL  LD WORD       ; CHECA EOL
+5238 5062		;	              -  EOL        ;
+023a 1260		;	              JZ FIMREAD    ; TERMINA LEITURA EM CASO POSITIVO
+523c 8053		;	      CHKEOF  LD WORD       ; CHECA EOF
+523e 5063		;	              -  EOF        ;
+0240 125c		;	              JZ FIMEOF     ; EXCECAO TRATADA POSTERIORMENTE
+ 
+0242 a28a		;	              SC SAVE       ; GUARDA ARGUMENTO (ROT INS OP)
+0244 0228		;	              JP READ       ; CONTINUA LEITURA
+
+; ===================================================================
+; CASO ESPECIFICO ENCONTRADO
+      
+5246 8054		;	      ISBLANK LD ISB        ; CHECA SE PALAVRA ANTERIOR ERA BRANCOS
+5248 5040		;	              -  H1         ;
+024a 1228		;	              JZ READ       ; EM CASO POSITIVO, CONTINUA LENDO
+024c a262		;	              SC ATTP       ; CASO CONTRARIO SIGNIFICA QUE ESTAVA GUARDANDO
+524e 8040		;	              LD H1         ; UMA PALAVRA E AGORA VAI GUARDAR OUTRA PORTANTO
+5250 9054		;	              MM ISB        ; ATUALIZA PONTEIRO DE ARMAZENAMENTO 
+0252 0228		;	              JP READ
+
+0254 d300		;	      IGNORE  GD /300       ; LE ATE ENCONTRAR EOL
+5256 5062		;	              -  EOL        ;
+0258 1260		;	              JZ FIMREAD    ; SE ACHOU, TERMINA LEITURA DA LINHA
+025a 0254		;	              JP IGNORE     ; CASO CONTRARIO CONTINUA
+
+525c 8040		;	      FIMEOF  LD H1         ; CARREGA 1 NA
+525e 9056		;	              MM P1END      ; VAR QUE INDICA EOF 
+0260 b21e		;	      FIMREAD RS READLINE ; FIM DE LEITURA DA LINHA
+
+; ===================================================================
+; ATTP -- ATUALIZA PONTEIRO DE ARMANZENAMENTO DE ARGUMENTOS
+0262 0000		;	      ATTP    K  /00
+5264 8058		;	              LD ARGCNT
+0266 126e		;	              JZ TOARG2
+5268 8061		;	      TOARG3  LD PARG3
+526a 9057		;	              MM PARG
+026c 1272		;	              JZ FIMAT
+526e 8060		;	      TOARG2  LD PARG2
+5270 9057		;	              MM PARG
+5272 8058		;	      FIMAT   LD ARGCNT
+5274 4040		;	              +  H1
+5276 9058		;	              MM ARGCNT
+0278 a262		;	              SC ATTP ;_gaia_ver_
+
+; ==================================================================
+; UNPACK -- DESEMPACOTA ACUMULADOR = /XYZT COMO - ©JJN/2005
+;           B1 = /00XY    E     B2 = /00ZT
+
+027a 0000		;	     UNPACK  JP    /00      ; ENTRADA DE UNPACK
+527c 9007		;	             MM    AUX      ; SALVA O ACUMULADOR
+;
+; ACUMULADOR = /XY * /100 + /ZT
+; DESCOMPACTA-OS EM DOIS BYTES (B1 E B2)
+;
+; B1 = /XY = (ACUMULADOR DIV /100)
+; B2 = /XYZT - (/100 * /XY)
+;
+527e 7044		;	             /     H100     ; SEPARA PRIMEIRO CARACTERE
+5280 9037		;	             MM    B1       ; GUARDA EM B1
+5282 6048		;	             *     HFF00    ; CALCULA -(/100 * B1)
+5284 4007		;	             +     AUX      ; SEPARA SEGUNDO CARACTERE
+5286 9038		;	             MM    B2       ; GUARDA EM B2
+0288 b27a		;	             RS    UNPACK   ; RETORNA
+
+
+; ===================================================================
+; SAVEARG -- GUARDA VALOR DE RÓTULO, OPERAÇÃO OU OPERANDO NA MEMORIA
+      
+028a 0000		;	      SAVE    K  /00
+528c 8057		;	              LD PARG     ; CARREGA PONTEIRO PARA ARMAZENAMENTO DE ARGUMENTO
+528e 4010		;	              +  MM       ; MONTA INSTRUCAO MM PARG
+0290 929a		;	              MM SAVE2    ; ARMAZENA
+5292 8057		;	              LD PARG     ;
+5294 4041		;	              +  H2       ;
+5296 9057		;	              MM PARG     ; ATUALIZA PONTEIRO
+5298 8053		;	              LD WORD     ; CARREGA PALAVRA LIDA
+529a 9057		;	      SAVE2   MM PARG     ; SALVA EM PARG
+029c b28a		;	              RS SAVE
+
+
+
+; ==================================================================
+; ERRO -- IMPRIME MENSAGEM DE ERRO - ©JJN/2005
+;         COM O CÓDIGO ASCII DE DUAS LETRAS PASSADO NO ACUMULADOR
+;
+; CÓDIGOS DE ERRO:
+; 2 - ERRO NO PASSO2
+; DD - DUPLA DEFINIÇÃO DE RÓTULO
+
+029e 0000		;	     ERRO    JP    /00      ; ENTRADA DE ERRO
+52a0 9007		;	             MM    AUX      ; SALVA CODIGO DO ERRO
+52a2 8026		;	             LD    ER       ; IMPRIME
+02a4 e001		;	             PD    /1       ;" ""ER"""
+52a6 8027		;	             LD    RO       ; IMPRIME
+02a8 e001		;	             PD    /1       ;" ""RO"""
+52aa 8028		;	             LD    COLLONB  ; IMPRIME
+02ac e001		;	             PD    /1       ;" "": """
+52ae 8007		;	             LD    AUX      ; IMPRIME
+02b0 e001		;	             PD    /1       ; CÓDIGO DO ERRO
+52b2 8014		;	             LD    CRLF     ; IMPRIME
+02b4 e001		;	             PD    /1       ; FIM DE LINHA
+02b6 b29e		;	             RS    ERRO     ; RETORNA
+
+
+

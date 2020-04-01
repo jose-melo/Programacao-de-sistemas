@@ -1,0 +1,232 @@
+; ==================================================================
+;** DECLARAÇÃO DE SÍMBOLOS IMPORTADOS E EXPORTADOS
+002a 0000 ; "MONTA1>"		;	MONTA1      >
+00c6 0000 ; "MONTA2>"		;	MONTA2      >
+
+4000 0000 ; "ERRO<"		;	ERRO        <
+4001 0000 ; "PARG3<"		;	PARG3       <
+4002 0000 ; "PARG2<"		;	PARG2       <
+4003 0000 ; "PARG1<"		;	PARG1       <
+4004 0000 ; "WORD<"		;	WORD        <
+4005 0000 ; "CONV<"		;	CONV        <
+
+4006 0000 ; "STE<"		;	STE         <
+4007 0000 ; "STI<"		;	STI         <
+4008 0000 ; "PST<"		;	PST         <
+4009 0000 ; "FIMASMB<"		;	FIMASMB     <
+4010 0000 ; "H2<"		;	H2          <
+4011 0000 ; "IC<"		;	IC          <
+4012 0000 ; "LD<"		;	LD          <
+4013 0000 ; "MM<"		;	MM          <
+4014 0000 ; "ARR<"		;	ARR         <
+4015 0000 ; "ECOM<"		;	ECOM        <
+4016 0000 ; "CIFRA<"		;	CIFRA       <
+4017 0000 ; "MTOC<"		;	MTOC        <
+4018 0000 ; "MNEM<"		;	MNEM        <
+4019 0000 ; "OPCODE<"		;	OPCODE      <
+4020 0000 ; "SPC2<"		;	SPC2        <
+4021 0000 ; "NEWLINE<"		;	NEWLINE     <
+4022 0000 ; "ADDRI<"		;	ADDRI       <
+4023 0000 ; "OPERAND<"		;	OPERAND     <
+
+
+
+; ====================================================================
+;** MONTALINHA -- TRADUZ OPERADOR E OPERANDO EM INSTRUÇÃO NA LINGUAGEM
+; DA MVN, ADICIONANDO ESPAÇO EM BRANCO E FIM DE LINHA - DLS 2018
+
+0000 0000		;	PONT1   $   =1   0
+				;	PONT1   $   =1
+0002 0000		;	PONT2   $   =1   0
+				;	PONT2   $   =1
+
+0004 0000		;	MONTALINHA  $   =1   0
+				;	MONTALINHA  $   =1
+0006 e302		;	            PD  /0302        ; SALVA NO ARQUIVO MVN
+5008 8020		;	            LD  SPC2         ; CARREGA ESPAÇO EM BRANCO
+000a e302		;	            PD  /0302        ; SALVA ESTE ESPAÇO NO ARQUIVO
+000c 8000		;	            LD  PONT1        ; MONTA INSTRUÇÃO QUE LÊ O ARGUMENTO 2
+500e 4012		;	            +   LD
+0010 9012		;	            MM  MNTOP        ; MONTA INSTRUÇÃO PARA LEITURA DO OPERADOR
+0012 0000		;	MNTOP       $   =0001        ; CARREGA O MNEMÔNICO   0
+				;	MNTOP       $   =0001        ; CARREGA O MNEMÔNICO
+5014 9018		;	            MM  MNEM         ; SALVA NO MNEMÔNICO 
+5016 a017		;	            SC  MTOC         ; E CONVERTE PARA CÓDIGO
+0018 8002		;	            LD  PONT2        ;
+501a 4012		;	            +   LD           ;
+001c 901e		;	            MM  MNTARG       ; MONTA INSTRUÇÃO PARA LEITURA DA OPERANDO
+001e 0000		;	MNTARG      $   =0001        ; CARREGA O OPERANDO   0
+				;	MNTARG      $   =0001        ; CARREGA O OPERANDO
+5020 4019		;	            +   OPCODE       ; SOMA COM O OPERADOR
+0022 e302		;	            PD  /0302        ; ADICIONA INSTRUÇÃO AO ARQUIVO MVN
+5024 8021		;	            LD  NEWLINE      ; ADICIONA UMA NOVA LINHA
+0026 e302		;	            PD  /0302        ; AO ARQUIVO
+0028 b004		;	            RS  MONTALINHA
+
+; ===================================================================
+; MONTA1 -- DEFINE TABELA DE SIMBOLOS
+; EM CADA LINHA SÃO GUARDADOS ARG1 ARG2 [ARG3]
+; CASO HAJA 3 ARGUMENTOS, INSERE O ROTULO NA TABELA DE SIMBOLOS OU ACUSA ERRO
+; AO INSERIR O ROTULO VINCULA IC A ELE
+; CASO HAJA APENAS 2 ARGUMENTOS, TRATA PSEUDO-INSTRUCOES
+002a 0000		;	MONTA1      K  /00          ; 
+502c 8001		;	            LD PARG3        ; CARREGA ENDEREÇO DO TERCEIRO ARG LIDO
+502e 4012		;	            +  LD           ; CONSTROI INSTRUCAO LOAD
+0030 9032		;	            MM GETARG3      ; SALVA EM GETARG3
+0032 0000		;	GETARG3     K  /00          ; CARREGA TERCEIRO ARG
+0034 107a		;	            JZ SEMROT       ; SE 0, TEM APENAS 2 ARGS = SEM ROTULO
+5036 8003		;	            LD PARG1        ; CASO CONTRARIO, INSERE ROTULO NA TABELA DE SIMBOLOS
+5038 4012		;	            +  LD           ; CONSTROI INSTRUCAO LOAD
+003a 903c		;	            MM GETROT       ; SALVA EM GETROT
+003c 0000		;	GETROT      K  /00          ; CARREGA ROTULO
+503e 9004		;	            MM WORD         ; SALVA EM WORD
+5040 8006		;	            LD STE          ; CARREGA SYMBOL TABLE END
+5042 9008		;	            MM PST          ; SALVA EM POINTER SYMBOL TABLE
+5044 5007		;	LOOPST      -  STI          ; FIM DA TABELA?
+0046 105c		;	            JZ DEFINE       ; INSERE NOVO SIMBOLO SE SIM
+5048 8008		;	            LD PST          ; CASO CONTRARIO, TESTA PROX END (BAIXO PARA CIMA)
+504a 4012		;	            +  LD           ; CONSTROI INSTRUCAO LOAD
+004c 904e		;	            MM COMP         ; SALVA EM COMP(ARA)
+004e 0000		;	COMP        K  /00          ; CARREGA SIMBOLO TABELADO
+5050 5004		;	            -  WORD         ; COMPARA COM LIDO AGORA
+0052 10c0		;	            JZ ERRROT       ; ACHOU, ACUSA ERRO
+5054 8008		;	            LD PST          ; NAO ACHOU,
+5056 5010		;	            -  H2           ; ATUALIZA PONTEIRO
+5058 9008		;	            MM PST          ; DA TABELA
+005a 0044		;	            JP LOOPST       ; REPETE
+505c 8006		;	DEFINE      LD STE          ; CARREGA FIM DA TABELA (POSICAO VAZIA)
+505e 4013		;	            +  MM           ; CONSTROI INSTRUCAO MOVE
+0060 9064		;	            MM INS          ; SALVA EM INS(ERE)
+5062 8004		;	            LD WORD         ; CARREGA SIMBOLO LIDO
+5064 9006		;	INS         MM STE          ; GUARDA NA ULTIMA POSICAO
+5066 8006		;	            LD STE          ; ADQUIRE PONTEIRO PARA
+5068 5007		;	            -  STI          ; TABELA DE ENDERECOS
+506a 4022		;	            +  ADDRI        ; + INICIO DA TABELA DE ENDERECOS
+506c 4013		;	            +  MM           ; + INSTRUCAO MOVE
+006e 9072		;	            MM DEFINE2      ; SALVA EM DEFINE2
+5070 8011		;	            LD IC           ; CARREGA IC
+5072 9022		;	DEFINE2     MM ADDRI        ; SALVA NO ENDERECO APONTADO
+5074 4010		;	            +  H2           ; INCREMENTA IC
+5076 9011		;	            MM IC           ; SALVA
+0078 b02a		;	FIMM1       RS MONTA1       ;
+
+507a 8003		;	SEMROT      LD PARG1        ; CARREGA POSICAO DO PRIMEIRO ARG = OP
+507c 4012		;	            +  LD           ; SOMA COM OPERACAO LOAD
+007e 9080		;	            MM GETOP        ; SALVA EM GETOP
+5080 8003		;	GETOP       LD PARG1        ; CARREGA OPERACAO
+5082 9018		;	            MM MNEM           ; SALVA EM MEMORIA
+5084 5014		;	            -  ARR          ; CHECA SE ARROBA
+0086 109c		;	            JZ RELOC        ; ATUALIZA IC EM CASO POSITIVO
+5088 8018		;	            LD MNEM
+508a 5015		;	            - ECOM          ; CHECA SE E COMERCIAL
+008c 109c		;	            JZ RELOC        ; ATUALIZA IC EM CASO POSITIVO
+508e 8018		;	            LD MNEM
+5090 5016		;	            -  CIFRA        ; CHECA SE CIFRAO
+0092 10ac		;	            JZ RESERVE      ; ATUALIZA IC EM CASO POSITIVO
+5094 8011		;	            LD IC           ; CASO NAO SEJA NENHUM DOS ANTERIORES
+5096 4010		;	            +  H2           ; APENAS INCREMENTA IC
+5098 9011		;	            MM IC           ; E SALVA
+009a 0078		;	            JP FIMM1        ; FINALIZA MONTA1
+
+509c 8002		;	RELOC       LD PARG2      ; CARREGA END DO OPERANDO
+509e 4012		;	            +  LD         ; CONSTROI INSTRUCAO LD
+00a0 90a2		;	            MM GETOP2     ; SALVA EM GETOP2
+50a2 8002		;	GETOP2      LD PARG2      ; CARREGA OPERANDO
+50a4 a005		;	            SC CONV       ; CONVERTE PARA HEXA
+50a6 8023		;	            LD OPERAND    ; CARREGA VALOR CONVERTIDO
+50a8 9011		;	            MM IC         ; ATUALIZA IC
+00aa 0078		;	            JP FIMM1      ; FINALIZA MONTA1
+50ac 8002		;	RESERVE     LD PARG2      ; CARREGA END DO OPERANDO
+50ae 4012		;	            +  LD         ; CONSTROI INSTRUCAO LD
+00b0 90b2		;	            MM GETOP3     ; SALVA EM GETOP3
+50b2 8002		;	GETOP3      LD PARG2      ; CARREGA OPERANDO
+50b4 a005		;	            SC CONV       ; CONVERTE PARA HEXA
+50b6 8023		;	            LD OPERAND    ; CARREGA VALOR CONVERTIDO        
+50b8 6010		;	            *  H2         ; MULTIPLICA AREA RESERVADA POR 2
+50ba 4011		;	            +  IC         ; SOMA COM IC
+50bc 9011		;	            MM IC         ; ATUALIZA IC
+00be 0078		;	            JP FIMM1      ; FINALIZA MONTA1
+
+00c0 3002		;	ERRROT      LV /2         ; EM CASO DE ROTULO JA DEFINIDO
+50c2 a000		;	            SC ERRO       ; ACUSA ERRO3
+50c4 0009		;	            JP FIMASMB    ; PARA MONTADOR
+
+
+; ==================================================================
+;** MONTA2 -- MONTA UMA LINHA DE CÓDIGO FONTE - DLS 2018
+; EM CADA LINHA, HÁ 3 ARGUMENTOS:
+; ARG1      ARG2        ARG3      . ELES FICAM:
+; RÓTULO    OPERADOR    OPERANDO  . (1) QUANDO HÁ RÓTULO, ELES SÃO:
+; OPERADOR  OPERANDO    0         . (2) QUANDO NÃO HÁ RÓTULO
+; EM AMBOS OS CASOS, SE CALCULA O IC:
+; QUANDO HÁ RÓTULO, IC = ADDR(RÓTULO)
+; QUANDO NÃO HÁ,    IC = IC + 2
+; SALVA-SE O IC COMO ENDEREÇO DE CÓDIGO NO ARQUIVO MVN
+; DAÍ, OBTÉM-SE O MNEMÔNICO E ESTE É CONVERTIDO PARA CÓDIGO DO OPERADOR
+; ENTÃO OBTÉM-SE O OPERANDO, SOMA-SE ELE AO OPERADOR
+; POR ÚLTIMO, SALVA-SE A INSTRUÇÃO NO ARQUIVO
+
+00c6 0000		;	MONTA2      $   /0001        ;    0
+				;	MONTA2      $   /0001        ; 
+50c8 8001		;	            LD  PARG3        ; 
+50ca 4012		;	            +   LD           ; 
+00cc 90ce		;	            MM  GETARG32     ; 
+00ce 0000		;	GETARG32    $   =0001        ;    0
+				;	GETARG32    $   =0001        ; 
+00d0 1112		;	            JZ  SEMROT2      ; NÃO HÁ RÓTULO
+50d2 8003		;	            LD  PARG1        ; SE HÁ RÓTULO, O TRATA
+50d4 4012		;	            +   LD           ; 
+00d6 90d8		;	            MM  GETROT2      ; 
+00d8 0000		;	GETROT2     $   =0001        ;    0
+				;	GETROT2     $   =0001        ; 
+50da 9004		;	            MM  WORD         ; 
+50dc 8006		;	            LD  STE          ; SYMBOL TABLE END
+50de 5010		;	            -   H2           ; STE E POSICAO VAZIA
+50e0 9008		;	            MM  PST          ; POINTER SYMBOL TABLE
+50e2 5007		;	LOOPST2     -   STI          ; PERCORREU TODA A TABELA DO FIM AO INÍCIO?
+00e4 20fa		;	            JN  ERRSYM       ; SÍMBOLO NÃO ESTÁ NA TABELA
+50e6 8008		;	            LD  PST          ; 
+50e8 4012		;	            +   LD           ; 
+00ea 904e		;	            MM  COMP         ; 
+00ec 0000		;	COMP2       $   =0001        ; CARREGA SIMBOLO TABELADO   0
+				;	COMP2       $   =0001        ; CARREGA SIMBOLO TABELADO
+50ee 5004		;	            -   WORD         ; COMPARA COM LIDO AGORA
+00f0 1102		;	            JZ  GETADDR      ; ACHOU, PEGA O SEU ENDEREÇO
+50f2 8008		;	            LD  PST          ; NAO ACHOU
+50f4 5010		;	            -   H2           ; ATUALIZA PONTEIRO
+50f6 9008		;	            MM  PST          ; DA TABELA
+00f8 00e2		;	            JP  LOOPST2      ; REPETE
+00fa 3002		;	ERRSYM      LV  /0002        ; CARREGA CÓDIGO DE ERRO 2
+50fc a000		;	            SC  ERRO         ; IMPRIME ERRO
+50fe 0009		;	            JP  FIMASMB      ; FINALIZA COM O ERRO ENCONTRADO
+5100 8004		;	            LD  WORD         ; CARREGA SIMBOLO LIDO
+5102 8008		;	GETADDR     LD  PST          ;
+5104 5007		;	            -   STI          ; PEGA VALOR CORRETO DO PONTEIRO
+5106 4022		;	            +   ADDRI        ; SOMA COM INICIO DA TABELA DE ENDERECOS 
+            ;/   H2           ;  ENCONTRA ONDE O ENDEREÇO ESTÁ ARMAZENADO !SÓ HÁ 1 WORD PARA CADA RÓTULO!
+5108 4012		;	            +   LD           ;  PREPARA INSTRUÇÃO PARA CARREGAR O ENDEREÇO DO RÓTULO
+010a 910c		;	            MM  LDADRR       ; 
+010c 0000		;	LDADRR      $   =0001        ;  AQUI É CARREGADO O ENDEREÇO DO RÓTULO   0
+				;	LDADRR      $   =0001        ;  AQUI É CARREGADO O ENDEREÇO DO RÓTULO
+510e 9011		;	            MM  IC           ; ATUALIZA IC
+0110 0122		;	            JP  COMROT
+
+5112 8011		;	SEMROT2     LD  IC           ; ATUALIZA IC
+5114 4010		;	            +   H2           ;
+5116 9011		;	            MM  IC           ;
+5118 8003		;	            LD  PARG1        ; LÊ PONTEIRO PARA O OPERADOR
+011a 9000		;	            MM  PONT1        ; SALVA NA VARIÁVEL1 DA FUNÇÃO QUE MONTA A LINHA 
+511c 8002		;	            LD  PARG2        ; LÊ PONTEIRO PARA O OPERANDO          
+011e 9002		;	            MM  PONT2        ; SALVA NA VARIÁVEL2 DA FUNÇÃO QUE MONTA A LINHA 
+0120 012c		;	            JP  CONCLUI
+
+5122 8002		;	COMROT      LD  PARG2        ; LÊ PONTEIRO PARA O OPERADOR
+0124 9000		;	            MM  PONT1        ; SALVA NA VARIÁVEL1 DA FUNÇÃO QUE MONTA A LINHA 
+5126 8001		;	            LD  PARG3        ; LÊ PONTEIRO PARA O OPERANDO          
+0128 9002		;	            MM  PONT2        ; SALVA NA VARIÁVEL2 DA FUNÇÃO QUE MONTA A LINHA
+012a 012c		;	            JP CONCLUI
+
+012c a004		;	CONCLUI     SC  MONTALINHA     
+012e b0c6		;	            RS  MONTA2
+
+

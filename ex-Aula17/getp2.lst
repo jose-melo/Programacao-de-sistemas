@@ -1,0 +1,118 @@
+;Teste
+; @ /0000
+;SC GETP
+;+ ASCII
+;PD /100
+;FIMTESTE HM FIMTESTE
+;--------------------------------------
+;EntryPoints e Externals
+;--------------------------------------
+2530 0000 ; "GETP>"		;	GETP >
+4000 0000 ; "SENHA<"		;	SENHA <
+4001 0000 ; "PSENHA<"		;	PSENHA <
+;======================================
+;Variáveis e Constantes
+;======================================
+				;	 &      /0500
+8500 2020		;	ESPACO K /2020
+8502 0000		;	I K /0000
+8504 0000		;	J K /0000
+8506 0001		;	UM K /0001
+8508 0008		;	OITO K /0008
+850a 0002		;	PASSO K /0002
+850c d000		;	GETOP K /D000
+850e 9000		;	MOVE K /9000
+8510 0000		;	AUX K /0000
+8512 0002		;	DOIS K /0002
+8514 8000		;	LOAD K /8000
+8516 5000		;	MENOS K /5000
+8518 3030		;	ASCII K /3030
+851a 0520		;	PBUFFER K BUFFER
+851c 0300		;	GET2 K /0300
+851e 0000		;	UL2 K /0000
+;--------------------------------------
+8520 0000		;	BUFFER K /0000
+8522 0000		;	 K /0000
+8524 0000		;	 K /0000
+8526 0000		;	 K /0000
+8528 0000		;	 K /0000
+852a 0000		;	 K /0000
+852c 0000		;	 K /0000
+852e 0000		;	 K /0000
+;--------------------------------------
+;Programa principal
+;--------------------------------------
+8530 0000		;	GETP K /0000
+8532 3000		;	 LV /0000
+a534 9502		;	 MM I
+a536 9504		;	 MM J
+a538 a570		;	LOOP SC PEGADADO
+a53a a57e		;	 SC ESCREVE
+a53c 8502		;	 LD I
+a53e 4506		;	 + UM
+a540 9502		;	 MM I
+a542 a570		;	 SC PEGADADO
+a544 5500		;	 - ESPACO
+a546 1538		;	 JZ LOOP
+8548 3000		;	 LV /0000
+a54a 9502		;	 MM I
+a54c 9504		;	 MM J
+a54e a592		;	LOOP2 SC CHECAI
+a550 1554		;	 JZ ATUALIZA
+a552 0568		;	 JP SENHAINCORRETA
+a554 8502		;	ATUALIZA LD I
+a556 4506		;	 + UM
+a558 9502		;	 MM I
+a55a 8504		;	 LD J
+a55c 4506		;	 + UM
+a55e 9504		;	 MM J
+a560 8502		;	 LD I
+a562 5508		;	 - OITO
+a564 156c		;	 JZ SENHACORRETA
+a566 054e		;	 JP LOOP2
+8568 3000		;	SENHAINCORRETA LV /0000
+a56a 056e		;	 JP FIMGETP
+856c 3001		;	SENHACORRETA LV /0001
+a56e b530		;	FIMGETP RS GETP
+;======================================
+;Função que lê o dado de UL
+;======================================
+8570 0000		;	PEGADADO K /0000
+a572 850c		;	 LD GETOP
+a574 451c		;	 + GET2
+a576 451e		;	 + UL2
+a578 957a		;	 MM INSTDADO
+857a 0000		;	INSTDADO K /0000
+a57c b570		;	 RS PEGADADO
+;======================================
+;Função que escreve
+;======================================
+857e 0000		;	ESCREVE K /0000
+a580 9510		;	 MM AUX
+a582 8502		;	 LD I
+a584 6512		;	 * DOIS
+a586 451a		;	 + PBUFFER
+a588 450e		;	 + MOVE
+a58a 958e		;	 MM INSTESCREVE
+a58c 8510		;	 LD AUX
+858e 0000		;	INSTESCREVE K /0000
+a590 b57e		;	 RS ESCREVE
+;=====================================
+;Funcao que checa a posição i e j
+;=====================================
+8592 0000		;	CHECAI K /0000
+a594 8502		;	 LD I
+a596 6512		;	 * DOIS
+a598 451a		;	 + PBUFFER
+a59a 4514		;	 + LOAD
+a59c 95a8		;	 MM LE1
+a59e 8504		;	 LD J
+a5a0 6512		;	 * DOIS
+d5a2 4001		;	 + PSENHA
+a5a4 4516		;	 + MENOS
+a5a6 95aa		;	 MM MENOS2
+85a8 0000		;	LE1 K /0000
+85aa 0000		;	MENOS2 K /0000
+a5ac 15b0		;	 JZ FIM
+85ae 3001		;	 LV /0001
+a5b0 b592		;	FIM RS CHECAI

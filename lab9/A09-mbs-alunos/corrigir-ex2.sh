@@ -3,6 +3,7 @@
 # ------------------------------------------------------------------
 # PARTE 1: Setup
 
+
 # Aborta o script em caso de erro.
 set -e
 

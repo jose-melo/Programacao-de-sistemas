@@ -1,0 +1,118 @@
+0000 A04A; SC GETP
+0002 4024; + ASCII
+0004 E100; PD 100
+0006 C006; HM FIMTESTE
+;======================================
+;Variáveis e Constantes
+;======================================
+0008 2020; Constante ESPACO
+000A 0000; Constante I
+000C 0000; Constante J
+000E 0001; Constante UM
+0010 0008; Constante OITO
+0012 0002; Constante PASSO
+0014 0000; Constante UL
+0016 0300; Constante GET
+0018 D000; Constante GETOP
+001A 9000; Constante MOVE
+001C 0000; Constante AUX
+001E 0002; Constante DOIS
+0020 8000; Constante LOAD
+0022 5000; Constante MENOS
+0024 3030; Constante ASCII
+0026 003A; Constante PBUFFER
+0028 002A; Constante PSENHA
+;--------------------------------------
+002A CADE; Constante SENHA
+002C E55E; Constante 
+002E B0DE; Constante 
+0030 0000; Constante 
+0032 0000; Constante 
+0034 0000; Constante 
+0036 0000; Constante 
+0038 0000; Constante 
+003A 0000; Constante BUFFER
+003C 0000; Constante 
+003E 0000; Constante 
+0040 0000; Constante 
+0042 0000; Constante 
+0044 0000; Constante 
+0046 0000; Constante 
+0048 0000; Constante 
+;--------------------------------------
+;Programa principal
+;--------------------------------------
+004A 0000; Constante GETP
+004C 3000; LV 0000
+004E 900A; MM I
+0050 900C; MM J
+0052 A08A; SC PEGADADO
+0054 A098; SC ESCREVE
+0056 800A; LD I
+0058 400E; + UM
+005A 900A; MM I
+005C A08A; SC PEGADADO
+005E 5008; - ESPACO
+0060 1052; JZ LOOP
+0062 3000; LV 0000
+0064 900A; MM I
+0066 900C; MM J
+0068 A0AC; SC CHECAI
+006A 106E; JZ ATUALIZA
+006C 0082; JP SENHAINCORRETA
+006E 800A; LD I
+0070 400E; + UM
+0072 900A; MM I
+0074 800C; LD J
+0076 400E; + UM
+0078 900C; MM J
+007A 800A; LD I
+007C 5010; - OITO
+007E 1086; JZ SENHACORRETA
+0080 0068; JP LOOP2
+0082 3000; LV 0000
+0084 0088; JP FIMGETP
+0086 3001; LV 0001
+0088 B04A; RS GETP
+;======================================
+;Função que lê o dado de UL
+;======================================
+008A 0000; Constante PEGADADO
+008C 8018; LD GETOP
+008E 4016; + GET
+0090 4014; + UL
+0092 9094; MM INSTDADO
+0094 0000; Constante INSTDADO
+0096 B08A; RS PEGADADO
+;======================================
+;Função que escreve
+;======================================
+0098 0000; Constante ESCREVE
+009A 901C; MM AUX
+009C 800A; LD I
+009E 601E; * DOIS
+00A0 4026; + PBUFFER
+00A2 401A; + MOVE
+00A4 90A8; MM INSTESCREVE
+00A6 801C; LD AUX
+00A8 0000; Constante INSTESCREVE
+00AA B098; RS ESCREVE
+;=====================================
+;Funcao que checa a posição i e j
+;=====================================
+00AC 0000; Constante CHECAI
+00AE 800A; LD I
+00B0 601E; * DOIS
+00B2 4026; + PBUFFER
+00B4 4020; + LOAD
+00B6 90C2; MM LE1
+00B8 800C; LD J
+00BA 601E; * DOIS
+00BC 4028; + PSENHA
+00BE 4022; + MENOS
+00C0 90C4; MM MENOS2
+00C2 0000; Constante LE1
+00C4 0000; Constante MENOS2
+00C6 10CA; JZ FIM
+00C8 3001; LV 0001
+00CA B0AC; RS CHECAI

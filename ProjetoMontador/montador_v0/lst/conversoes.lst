@@ -1,0 +1,487 @@
+; ====================================================================
+; ***** ROTINAS DE CONVERSÃO DE DADOS ******
+
+; Símbolos importados e exportados
+4000 0000 ; "LINHA<"		;	LINHA   <
+4001 0000 ; "PLINHA<"		;	PLINHA  <
+4002 0000 ; "LD<"		;	LD      <
+4003 0000 ; "MM<"		;	MM      <
+4004 0000 ; "OP<"		;	OP      <
+4005 0000 ; "OPERAND<"		;	OPERAND <
+4006 0000 ; "AUX<"		;	AUX     <
+4007 0000 ; "AUX1<"		;	AUX1    <
+4008 0000 ; "BARRA<"		;	BARRA   <
+4009 0000 ; "APOST<"		;	APOST   <
+4010 0000 ; "DIG9<"		;	DIG9    <
+4011 0000 ; "H0<"		;	H0      <
+4012 0000 ; "H2<"		;	H2      <
+4013 0000 ; "H9<"		;	H9      <
+4014 0000 ; "H30<"		;	H30     <
+4015 0000 ; "H40<"		;	H40     <
+4016 0000 ; "H0A<"		;	H0A     <
+4017 0000 ; "H1000<"		;	H1000   <
+4018 0000 ; "H2F<"		;	H2F     <
+4019 0000 ; "HFFFF<"		;	HFFFF   <
+4020 0000 ; "RTOP<"		;	RTOP    <
+4021 0000 ; "CONT<"		;	CONT    <
+4022 0000 ; "LOAD<"		;	LOAD    <
+4023 0000 ; "UNPACK<"		;	UNPACK  <
+4024 0000 ; "B1<"		;	B1      <
+4025 0000 ; "B2<"		;	B2      <
+
+00a0 0000 ; "HEXBIN>"		;	HEXBIN  >
+00d6 0000 ; "DECBIN>"		;	DECBIN  >
+014a 0000 ; "OCTBIN>"		;	OCTBIN  >
+010e 0000 ; "BINHEX>"		;	BINHEX  >
+0180 0000 ; "BINBIN>"		;	BINBIN  >
+002e 0000 ; "CONV>"		;	CONV    >
+
+
+; ===================================================================
+; ÁREAS DE DADOS DAS ROTINAS DE CONVERSÃO NUMÉRICA
+; ===================================================================
+;
+;** INDICADORES DOS TIPOS DE CONVERSÃO DA ROTINA CONV
+;     (SE NÃO FOR NENHUM DOS CINCO, ENTÃO NÃO É NUMÉRICO)
+;
+0000 002f		;	         TIPOS  K   /02F      ;" ""/"" : HEXADECIMAL"
+0002 003d		;	                K   /03D      ;" ""="" : DECIMAL"
+0004 0040		;	                K   /040      ;" ""@"" : OCTAL"
+0006 0023		;	                K   /023      ;" ""#"" : BINÁRIO"
+0008 0027		;	                K   /027      ;" ""'"" : ASCII "
+
+; ====================================================================
+; ====================================================================
+;** CURSORES APONTAM OS ÚLTIMOS ELEMENTOS DAS TABELAS DE DÍGITOS
+;     NESSAS CONSTANTES ESTÁ A INFORMAÇÃO DO COMPRIMENTO DAS TABELAS
+;
+000a 001e		;	       PDHEX   K    /001E     ; /01E=(2 * (N. DE DIG. HEXA = /10) = /20)-2
+000c 0012		;	       PDDEC   K    /0012     ; /012=(2 * (N. DE DIG. DECIMAIS= /0A)= /14)- 2 
+000e 000e		;	       PDOCT   K    /000E     ; /00E=(2 * (N. DE DIG. OCTAIS= /08)= /10)- 2 
+0010 0002		;	       PDBIN   K    /0002     ; /002=(2 * (N. DE DIG. BINÁRIOS= /02)= /04)- 2 
+0012 0000		;	       PDASC   K    /0000     ; PDASC K /FFFF ; -1 (NÃO EXISTE A TABELA DASC);
+ 
+; ====================================================================
+;** CURSORES PARA OS PRIMEIROS ELEMENTOS DAS TABELAS DE DÍGITOS
+
+0014 0150		;	       PPDHEX  K    /0150     ; ENDEREÇO DE DHEX
+0016 015c		;	       PPDDEC  K    /015C     ; ENDEREÇO DE DDEC
+0018 0160		;	       PPDOCT  K    /0160     ; ENDEREÇO DE DOCT
+001a 016c		;	       PPDBIN  K    /016C     ; ENDEREÇO DE DBIN
+001c ffff		;	       PPDASC  K    /FFFF     ; -1 (NÃO EXISTE A TABELA DASC)
+; 
+; ====================================================================
+;** CURSORES PARA OS PRIMEIROS ELEMENTOS DAS TABELAS DE VALORES CONVERTIDOS
+;
+001e 0170		;	       PPBHEX  K    /0170     ; ENDEREÇO DE BHEX
+0020 017c		;	       PPBDEC  K    /017C     ; ENDEREÇO DE BDEC
+0022 0180		;	       PPBOCT  K    /0180     ; ENDEREÇO DE BOCT
+0024 018c		;	       PPBBIN  K    /018C     ; ENDEREÇO DE BBIN
+0026 ffff		;	       PPBASC  K    /FFFF     ; -1 (NÃO EXISTE A TABELA DASC)
+; 
+; ====================================================================
+;
+;
+; ==================================================================
+; 02F0 A 0233 - ÁREA DA ANTIGA VERSÃO DE TSIMB - LIVRE
+
+0028 0000		;	TEMP        $   =1   0
+				;	TEMP        $   =1
+002a 0000		;	MARKER      $   =1   0
+				;	MARKER      $   =1
+002c 0000		;	TOCONVERT   $   =1   0
+				;	TOCONVERT   $   =1
+; ==================================================================
+; Deve converter OPERANDO para HEXA
+; RECEBE OPERANDO no ACUMULADOR
+; CONV -- CONVERTE OPERANDO de ascii PARA BINÁRIO - ©JJN/2005
+;         RETORNA COM VALOR CONVERTIDO EM OPERAND
+
+002e 0000		;	     CONV     JP /00      ; ENTRADA DE CONV -> ALVO ESTA NO ACUMULADOR
+5030 a023		;	              SC UNPACK   ; SEPARA EM B1 E B2
+5032 8024		;	              LD B1       ; TRATA B1 PRIMEIRO
+5034 5015		;	              -  H40      ; CHECA SE <9
+0036 2040		;	              JN LT9      ; POSITIVO
+5038 4013		;	              +  H9       ; >9, SOMA 9
+503a 6016		;	              *  H0A      ; MULTIPLICA POR =10
+503c 9005		;	              MM OPERAND  ; SALVA EM OPERAND
+003e 0048		;	              JP CONVB2
+5040 8024		;	      LT9     LD B1       ; <9
+5042 5014		;	              -  H30      ; SUBTRAIR 0x30
+5044 6016		;	              *  H0A      ; MULTIPLICA POR =10
+5046 9005		;	              MM OPERAND  ; SALVA EM OPERAND
+5048 8025		;	      CONVB2  LD B2       ; TRATA B2
+504a 5015		;	              -  H40      ; CHECA SE <9
+004c 2054		;	              JN LT92     ; POSITIVO
+504e 4013		;	              +  H9       ; >9, SOMA 9
+5050 4005		;	              +  OPERAND  ; SOMA EM OPERAND
+0052 005a		;	              JP FIMCONV
+5054 8024		;	      LT92    LD B1
+5056 5014		;	              -  H30
+5058 4005		;	              +  OPERAND
+005a b02e		;	      FIMCONV RS CONV
+
+; ===================================================================
+;***** TRADUZ1 - CONVERTE CONFORME TABELAS DE CONVERSÃO (TX PARA TY)- ©JJN/2005
+;
+; RECEBE DADO  - DADO A SER CONVERTIDO (1 PALAVRA) 
+;        CTX - INFORMA O COMPRIMENTO DA TABELA (TX OU TY)
+;        PTX - ENDEREÇO DO INICIO DA TABELA TX
+;        PTY - ENDEREÇO DO INICIO DA TABELA DE CÓDIGOS
+;
+; PRODUZ RESUL - RESULTADO DA CONVERSÃO (1 PALAVRA)EM RESUL E NO ACUMULADOR
+;                NÃO ENCONTRANDO, RETORNA -1 
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO EXTRAIDO DE HB):
+;        LD DIGHEXA ; DÍGITO ASCII A CONVERTER
+;        MM DADO    ; SALVA EM DADO O DIGITO A CONVERTER
+;        LD PPDHEX  ; ENDEREÇO DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+;        MM PTX
+;        LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+;        MM CTX
+;        LD PPBHEX  ; ENDEREÇO DE BHEX (TABELA BINÁRIA DE DÍGITOS HEXA)
+;        MM PTY
+;        SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+                   ; O RESULTADO JÁ FICA NO ACUMULADOR)
+
+;                                                                         OK CODIFICADO
+005c 0000		;	TRADUZ1     JP    /0000    ; PONTO DE ENTRADA DE MTOC
+005e 8194		;	            LD    CTX      ; AC := COMPRIMENTO DA TABELA TX - 2
+5060 9006		;	            MM    AUX      ; GUARDA EM UM CURSOR DE TRABALHO
+0062 8192		;	            LD    PTX      ; MONTA 
+5064 4021		;	            +     CONT     ; INSTRUÇÃO
+5066 4022		;	            +     LOAD     ; LD TX[CONT]
+0068 9082		;	            MM    LT2      ; Modifica a proxima instrucao
+006a 8000		;	LT1         LD    /00      ; LOOP:   AC := TX[CONT]
+006c 5190		;	            -     DADO     ; AC := AC - DADO
+006e 107a		;	            JZ    ENCON2   ; IF AC = 0, goto ENCONTROU2
+5070 8021		;	            LD    CONT     ; AC := CONT
+5072 5012		;	            -     H2       ; AC := AC - 2
+5074 9021		;	            MM    CONT     ; CONT := AC
+0076 2088		;	            JN    ERR2     ; IF AC < 0, goto ERRO2
+0078 006a		;	            JP    LT1      ; goto LOOP
+007a 8196		;	ENCON2      LD    PTY      ; ENCONTROU2: AC := PTY
+507c 4021		;	            +     CONT     ; AC := AC + CONT
+507e 4022		;	            +     LOAD     ; AC := AC + CONT + #LOAD
+0080 9082		;	            MM    LT2      ; Modifica a proxima instrucao
+0082 8000		;	LT2         LD    /00      ;" ""LD TY[CONT]"" RESULTADO DA CONVERSÃO"
+0084 919c		;	LT3         MM    RESUL    ; RESUL := AC
+0086 b05c		;	            RS    TRADUZ1  ; RETORNA
+5088 8019		;	ERR2        LD    HFFFF    ; DADO INVÁLIDO 
+008a 0084		;	            JP    LT3      ; VAI RETORNAR -1 
+
+
+
+; ====================================================================
+;
+;** HB - CONVERTE UM DIGITO HEXADECIMAL PARA BINÁRIO - ©JJN/2005
+;
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO):
+;
+;           LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO HEXA
+;           SC HB     ; HB CONVERTE-O PARA BINÁRIO, E
+;           MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+                     ; MAS TAMBÉM ESTÁ DISPONÍVEL EM RESUL
+
+;                                                                          OK CODIFICADO
+008c 0000		;	      HB      JP /00     ; ENTRADA DE HB
+008e 9190		;	              MM DADO    ; SALVA EM DADO A INFORMAÇÃO RECEBIDA NO ACUMULADOR
+0090 8014		;	              LD PPDHEX  ; ENDEREÇO DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+0092 9192		;	              MM PTX
+0094 800a		;	              LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+0096 9194		;	              MM CTX
+0098 801e		;	              LD PPBHEX  ; ENDEREÇO DE BHEX (TABELA BINÁRIA DE DÍGITOS HEXA)
+009a 9196		;	              MM PTY
+009c a05c		;	              SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+009e b08c		;	              RS HB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+
+
+
+; ====================================================================
+;  *** HEXBIN - ROTINA DE CONVERSÃO HEXADECIMAL PARA BINÁRIO ***  ©JJN/2005 verificar
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;                                                                         OK CODIFICADO
+00a0 0000		;	     HEXBIN  JP    /00        ; ENTRADA DE HEXBIN
+50a2 8011		;	             LD    H0         ; INICIA OPERANDO 
+50a4 9005		;	             MM    OPERAND    ; COM ZERO
+50a6 8001		;	             LD    PLINHA     ; MONTA INSTRUÇÃO
+50a8 4002		;	             +     LD         ;" ""LD LINHA[PLINHA]"""
+00aa 90ac		;	     L6      MM    PREXB        ;_aqui ; GUARDA PARA EXECUTAR ADIANTE
+50ac 8000		;	     PREXB      LD    LINHA     ;_aqui ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+00ae a08c		;	             SC    HB         ; CONVERTE PARA BINÁRIO
+00b0 20c0		;	             JN    FORAH      ;_aqui ; NÃO ERA DÍGITO HEXA: ACABOU
+50b2 8005		;	             LD    OPERAND    ; OBTEM RESULTADO DA CONVERSÃO (AC, RESUL)
+00b4 6198		;	             *     H10        ; ERA: MULTIPLICA OPERAND POR (/10 = 16)
+00b6 419c		;	             +     RESUL      ; SOMA O DÍGITO CONVERTIDO
+50b8 9005		;	             MM    OPERAND    ; ATUALIZA OPERAND
+00ba 80ac		;	             LD    PREXB        ;_aqui ; MODIFICA NOVAMENTE A INSTRUÇÃO
+50bc 4012		;	             +     H2         ; APONTANDO O PRÓXIMO CARACTERE
+00be 00aa		;	             JP    L6         ; VAI TRATAR OUTRO DIGITO
+00c0 b0a0		;	     FORAH    RS    HEXBIN    ;_aqui ; NÃO É DÍGITO: RETORNA
+
+
+
+; ====================================================================
+;** DB - CONVERTE UM DIGITO DECIMAL PARA BINÁRIO - ©JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO DECIMAL
+;                        SC DB     ; DB CONVERTE-O PARA BINÁRIO, E
+;                        MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+                                  ; MAS TAMBÉM ESTÁ DISPONÍVEL EM RESUL
+;                                                                          OK CODIFICADO
+00c2 0000		;	      DB    JP /00     ; ENTRADA DE DB
+00c4 9190		;	            MM DADO    ; SALVA EM DADO A INFORMAÇÃO RECEBIDA NO ACUMULADOR
+00c6 8016		;	            LD PPDDEC  ; ENDEREÇO DE DDEC (TABELA ASCII DE DIG. DECIMAIS)
+00c8 9192		;	            MM PTX
+00ca 800c		;	            LD PDDEC   ; COMPRIMENTO DA TABELA DDEC 
+00cc 9194		;	            MM CTX
+00ce 8020		;	            LD PPBDEC  ; ENDEREÇO DE BDEC (TABELA BINÁRIA DE DÍG. DECIMAIS)
+00d0 9196		;	            MM PTY
+00d2 a05c		;	            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+00d4 b0c2		;	            RS DB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+
+
+; ====================================================================
+;  *** DECBIN - ROTINA DE CONVERSÃO DECIMAL PARA BINÁRIO *** verificar - ©JJN/2005
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;                                                                          OK CODIFICADO
+00d6 0000		;	     DECBIN  JP    /00        ; ENTRADA DE DECBIN
+50d8 8011		;	             LD    H0         ; INICIA OPERAND
+50da 9005		;	             MM    OPERAND    ; COM ZERO
+50dc 8001		;	             LD    PLINHA     ; MONTA INSTRUÇÃO
+50de 4002		;	             +     LD         ;" ""LD LINHA[PLINHA]"""
+00e0 90e2		;	     D6D      MM    PRD       ;_aqui  ; GUARDA PARA EXECUTAR ADIANTE
+50e2 8000		;	     PRD      LD    LINHA      ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+00e4 a0c2		;	             SC    DB         ; CONVERTE PARA BINÁRIO
+00e6 20f6		;	             JN    FORAD      ;_aqui ; NÃO ERA DÍGITO HEXA: ACABOU
+50e8 8005		;	             LD    OPERAND    ; OBTEM RESULTADO DA CONVERSÃO (AC, RESUL)
+50ea 6016		;	             *     H0A        ; ERA: MULTIPLICA OPERAND POR (/0A = 10)
+00ec 419c		;	             +     RESUL      ; SOMA O DÍGITO CONVERTIDO
+50ee 9005		;	             MM    OPERAND    ; ATUALIZA OPERAND
+00f0 80e2		;	             LD    PRD        ;_aqui ; MODIFICA NOVAMENTE A INSTRUÇÃO
+50f2 4012		;	             +     H2         ; APONTANDO O PRÓXIMO CARACTERE
+00f4 00e0		;	             JP    D6D         ; VAI TRATAR OUTRO DIGITO
+00f6 b0d6		;	     FORAD    RS    DECBIN    ;_aqui ; NÃO É DÍGITO: RETORNA
+
+
+; ====================================================================
+;
+;** BH - CONVERTE UM NIBBLE PARA HEXADECIMAL - ©JJN/2005
+;
+;          RECEBE O DADO NO ACUMULADOR (NUMERO BINÁRIO DE 4 BITS S/SINAL)
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO):
+
+;           LD INFASC ; SUPONDO QUE INFASC TENHA UM NIBBLE
+;           SC BH     ; BH CONVERTE-O PARA DIGITO HEXA EM ASCII, E
+;           MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+                     ; MAS TAMBÉM ESTÁ DISPONÍVEL EM RESUL
+
+                                                                          
+00f8 0000		;	      BH      JP /00     ; ENTRADA DE HB
+00fa 9190		;	              MM DADO    ; SALVA EM DADO A INFORMAÇÃO RECEBIDA NO ACUMULADOR
+00fc 801e		;	              LD PPBHEX  ; ENDEREÇO DE BHEX (TABELA BINÁRIA DE DÍGITOS HEXA)
+00fe 9192		;	              MM PTX
+0100 800a		;	              LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+0102 9194		;	              MM CTX
+0104 8014		;	              LD PPDHEX  ; ENDEREÇO DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+0106 9196		;	              MM PTY
+0108 a05c		;	              SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+010a b0f8		;	              RS BH      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+
+; ====================================================================
+; ====================================================================
+;  *** BINHEX - ROTINA DE CONVERSÃO BINÁRIO PARA HEXADECIMAL ***  ©JJN/2005 
+;               ENTRADA NO ACUMULADOR - NUMERO BINÁRIO DE 16 BITS
+;               RESULTADO: 4 CARACTERES ASCII NO ARQUIVO DE SAIDA
+;                                                                          OK CODIFICADO
+010c 0000		;	    FATOR     K     /0000 ;_aqui ADICIONADO. CORETO? R: ???
+
+010e 0000		;	     BINHEX  JP    /00        ; ENTRADA DE BINHEX
+
+5110 9006		;	             MM    AUX        ; SALVA NUMERO ORIGINAL
+5112 8017		;	             LD    H1000      ; FAZ FATOR=2**12 
+
+0114 910c		;	     LPBHEX  MM    FATOR      ; POSICIONA NO PRÓXIMO NIBBLE A TRATAR
+
+5116 8006		;	             LD    AUX        ; RECUPERA O QUE RESTA DO NUMERO ORIGINAL
+0118 710c		;	             /     FATOR      ; OBTEM PROXIMO NIBBLE MAIS SIGNIFICATIVO
+511a 9007		;	             MM    AUX1       ; SALVA-O
+
+011c a0f8		;	             SC    BH         ; CONVERTE PARA HEXADECIMAL (ASCII)
+011e e003		;	             PD    /3         ; GERA-O NO ARQUIVO DE SAIDA
+
+5120 8007		;	             LD    AUX1       ; RECUPERA O ÚLTIMO NIBBLE TRATADO
+0122 610c		;	             *     FATOR      ; POSICIONA-O ADEQUADAMENTE
+5124 9007		;	             MM    AUX1       ; GUARDA PARA SUBTRAIR ADIANTE
+
+5126 8006		;	             LD    AUX        ; RECUPERA O RESTANTE DO NUMERO 
+5128 5007		;	             -     AUX1       ; REMOVE O NIBBLE TRATADO
+512a 9006		;	             MM    AUX        ; GUARDA PARA TRATAR O PRÓXIMO NIBBLE
+
+012c 810c		;	             LD    FATOR      ; FAZ FATOR
+012e 7198		;	             /     H10        ; := FATOR/(2**4)
+0130 1134		;	             JZ    FIMBHEX    ; SE ESGOTOU OS 4 DIGITOS, VAI RETORNAR
+0132 0114		;	             JP    LPBHEX     ; SE NÃO, VOLTA AO LOOP
+
+0134 b10e		;	     FIMBHEX RS    BINHEX     ; RETORNA
+
+; ====================================================================
+; ROTINAS ADICIONAIS, A SEREM CODIFICADAS EM LINGUAGEM DE MÁQUINA
+; ====================================================================
+;
+;** OB - CONVERTE UM DIGITO OCTAL PARA BINÁRIO - ©JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC  ; SUPONDO QUE INFASC TENHA UM DIGITO DECIMAL
+;                        SC OB      ; OB CONVERTE-O PARA BINÁRIO, E
+;                        MM INFBIN  ; O RESULTADO PODE SER GUARDADO EM INFBIN
+                                   ; MAS TAMBÉM ESTÁ DISPONÍVEL EM RESUL
+
+0136 0000		;	      OB    JP /00     ; ENTRADA DE OB
+0138 9190		;	            MM DADO    ; SALVA EM DADO A INFORMAÇÃO RECEBIDA NO ACUMULADOR
+013a 8018		;	            LD PPDOCT  ; ENDEREÇO DE DDEC (TABELA ASCII DE DIG. OCTAIS)
+013c 9192		;	            MM PTX
+013e 800e		;	            LD PDOCT   ; COMPRIMENTO DA TABELA DDEC 
+0140 9194		;	            MM CTX
+0142 8022		;	            LD PPBOCT  ; ENDEREÇO DE BDEC (TABELA BINÁRIA DE DÍG. DECIMAIS)
+0144 9196		;	            MM PTY
+0146 a05c		;	            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+0148 b136		;	            RS OB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+
+
+; ====================================================================
+;  *** OCTBIN - ROTINA DE CONVERSÃO OCTAL PARA BINÁRIO *** verificar - ©JJN/2005
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;
+014a 0000		;	     OCTBIN  JP    /00        ; ENTRADA DE OCTBIN
+514c 8011		;	             LD    H0         ; INICIA OPERAND
+514e 9005		;	             MM    OPERAND    ; COM ZERO
+5150 8001		;	             LD    PLINHA     ; MONTA INSTRUÇÃO
+5152 4002		;	             +     LD         ;" ""LD LINHA[PLINHA]"""
+0154 9156		;	     D6O      MM    PREX        ;_aqui_ ; GUARDA PARA EXECUTAR ADIANTE
+5156 8000		;	     PREX      LD    LINHA     ;_aqui ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+0158 a136		;	             SC    OB         ; CONVERTE PARA BINÁRIO
+015a 216a		;	             JN    FORAO      ;_aqui ; NÃO ERA DÍGITO OCTAL: ACABOU
+515c 8005		;	             LD    OPERAND    ; OBTEM RESULTADO DA CONVERSÃO (AC, RESUL)
+015e 619a		;	             *     H8        ; ERA: MULTIPLICA OPERAND POR /08
+0160 419c		;	             +     RESUL      ; SOMA O DÍGITO CONVERTIDO
+5162 9005		;	             MM    OPERAND    ; ATUALIZA OPERAND
+0164 8156		;	             LD    PREX        ;_aqui ; MODIFICA NOVAMENTE A INSTRUÇÃO
+5166 4012		;	             +     H2         ; APONTANDO O PRÓXIMO CARACTERE
+0168 0154		;	             JP    D6O         ; VAI TRATAR OUTRO DIGITO
+016a b14a		;	     FORAO    RS    OCTBIN    ;_aqui ; NÃO É DÍGITO: RETORNA
+
+
+; ====================================================================
+;
+;** BB - CONVERTE UM DÍGITO BINÁRIO PARA BINÁRIO - ©JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVÁLIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO BINÁRIO
+;                        SC BB     ; BB CONVERTE-O PARA BINÁRIO, E
+;                        MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+                                  ; MAS TAMBÉM ESTÁ DISPONÍVEL EM RESUL
+
+016c 0000		;	      BB    JP /00     ; ENTRADA DE BB
+016e 9190		;	            MM DADO    ; SALVA EM DADO A INFORMAÇÃO RECEBIDA NO ACUMULADOR
+0170 801a		;	            LD PPDBIN  ; ENDEREÇO DE DDEC (TABELA ASCII DE DIG. BINÁRIOS)
+0172 9192		;	            MM PTX
+0174 8010		;	            LD PDBIN   ; COMPRIMENTO DA TABELA DDEC 
+0176 9194		;	            MM CTX
+0178 8024		;	            LD PPBBIN  ; ENDEREÇO DE BDEC (TABELA BINÁRIA DE DÍG. BINÁRIOS)
+017a 9196		;	            MM PTY
+017c a05c		;	            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+017e b16c		;	            RS BB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+
+; ====================================================================
+;  *** BINBIN - ROTINA DE CONVERSÃO BINÁRIO PARA BINÁRIO
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+
+0180 0000		;	     BINBIN  K    /00        ; ENTRADA DE BINBIN
+5182 8011		;	             LD    H0         ; INICIA OPERAND
+5184 9005		;	             MM    OPERAND    ; COM ZERO
+5186 8001		;	             LD    PLINHA     ; MONTA INSTRUÇÃO
+5188 4002		;	             +     LD         ;" ""LD LINHA[PLINHA]"""
+018a 918c		;	     D6B     MM    PRB        ;_aqui ; GUARDA PARA EXECUTAR ADIANTE
+518c 8000		;	     PRB     LD    LINHA      ;_aqui; MM LINHA[PLINHA] (TRAZ EM ASCII)
+018e a16c		;	             SC    BB         ; CONVERTE PARA BINÁRIO
+0190 21a0		;	             JN    FORAB      ;_aqui ; NÃO ERA DÍGITO HEXA: ACABOU
+5192 8005		;	             LD    OPERAND    ; OBTEM RESULTADO DA CONVERSÃO (AC, RESUL)
+5194 6016		;	             *     H0A        ; ERA: MULTIPLICA OPERAND POR (/0A = 10)
+0196 419c		;	             +     RESUL      ; SOMA O DÍGITO CONVERTIDO
+5198 9005		;	             MM    OPERAND    ; ATUALIZA OPERAND
+019a 818c		;	             LD    PRB        ;_aqui ; MODIFICA NOVAMENTE A INSTRUÇÃO
+519c 4012		;	             +     H2         ; APONTANDO O PRÓXIMO CARACTERE
+019e 018a		;	             JP    D6B         ; VAI TRATAR OUTRO DIGITO
+01a0 b180		;	    FORAB    RS    BINBIN    ;_aqui; NÃO É DÍGITO: RETORNA
+;
+;
+
+
+; ====================================================================
+;** TABELAS DE DIGITOS HEXA, DECIMAIS, OCTAIS, BINÁRIOS ***
+;
+				;	                          @    /150
+0150 0046		;	        DHEX   K    /46       ;" ""F"""
+0152 0045		;	               K    /45       ;" ""E"""
+0154 0044		;	               K    /44       ;" ""D"""
+0156 0043		;	               K    /43       ;" ""C"""
+0158 0042		;	               K    /42       ;" ""B"""
+015a 0041		;	               K    /41       ;" ""A"""
+015c 0039		;	        DDEC   K    /39       ;" ""9"""
+015e 0038		;	               K    /38       ;" ""8"""
+0160 0037		;	        DOCT   K    /37       ;" ""7"""
+0162 0036		;	               K    /36       ;" ""6"""
+0164 0035		;	               K    /35       ;" ""5"""
+0166 0034		;	               K    /34       ;" ""4"""
+0168 0033		;	               K    /33       ;" ""3"""
+016a 0032		;	               K    /32       ;" ""2"""
+016c 0031		;	        DBIN   K    /31       ;" ""1"""
+016e 0030		;	               K    /30       ;" ""0"""
+
+ 
+; ====================================================================
+;** TABELAS DE NÚMEROS BINÁRIOS CORRESPONDENTES ***
+;
+0170 000f		;	        BHEX   K    /000F     ;" ""F"""
+0172 000e		;	               K    /000E     ;" ""E"""
+0174 000d		;	               K    /000D     ;" ""D"""
+0176 000c		;	               K    /000C     ;" ""C"""
+0178 000b		;	               K    /000B     ;" ""B"""
+017a 000a		;	               K    /000A     ;" ""A"""
+017c 0009		;	        BDEC   K    /0009     ;" ""9"""
+017e 0008		;	               K    /0008     ;" ""8"""
+0180 0007		;	        BOCT   K    /0007     ;" ""7"""
+0182 0006		;	               K    /0006     ;" ""6"""
+0184 0005		;	               K    /0005     ;" ""5"""
+0186 0004		;	               K    /0004     ;" ""4"""
+0188 0003		;	               K    /0003     ;" ""3"""
+018a 0002		;	               K    /0002     ;" ""2"""
+018c 0001		;	        BBIN   K    /0001     ;" ""1"""
+018e 0000		;	               K    /0000     ;" ""0"""
+;
+0190 0000		;	        DADO   K    /0000     ; PARÂMETRO DE ENTRADA DAS ROTINAS DE CONVERSÃO
+0192 0000		;	        PTX    K    /0000     ; PARÂMETRO DE ENTRADA DAS ROTINAS DE CONVERSÃO
+0194 0000		;	        CTX    K    /0000     ; PARÂMETRO DE ENTRADA DAS ROTINAS DE CONVERSÃO
+0196 0000		;	        PTY    K    /0000     ; PARÂMETRO DE ENTRADA DAS ROTINAS DE CONVERSÃO
+0198 0010		;	        H10    K    /0010     ; BASE HEXADECIMAL
+019a 0008		;	        H8     K    /0008     ; BASE OCTAL
+019c 0000		;	        RESUL  K    /0000     ; RESULTADO DA CONVERSÃO
+;
+;

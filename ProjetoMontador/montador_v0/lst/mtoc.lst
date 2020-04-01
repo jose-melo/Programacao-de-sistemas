@@ -1,0 +1,97 @@
+; ===================================================================
+; DOUGLAS 14/04 17:59
+;** ÁREA DE DADOS DE MTOC ***
+4000 0000 ; "AUX<"		;	        AUX         <
+4001 0000 ; "H2<"		;	        H2          <
+4002 0000 ; "LOAD<"		;	        LOAD        <
+
+0058 0000 ; "MTOC>"		;	        MTOC        >
+        
+0052 0000 ; "MNEM>"		;	        MNEM        >
+0054 0000 ; "OPCODE>"		;	        OPCODE      >
+
+
+;** TABELA DE MNEMONICOS ***
+;
+0000 4c44		;	      TMNEM    K    /4C44    ; 8 LD Load accumulator from memory -- MNEMONICS
+0002 4d4d		;	               K    /4D4D    ; 9 MM Memorize from accumulator -- MNEMONICS
+0004 5343		;	               K    /5343    ; a SC Subroutine call -- MNEMONICS
+0006 5253		;	               K    /5253    ; b RS Return from subroutine -- MNEMONICS
+0008 484d		;	               K    /484d    ; c HM Halt MVN -- MNEMONICS
+000a 4744		;	               K    /4744    ; d GD Get data from device -- MNEMONICS
+000c 5044		;	               K    /5044    ; e PD Put data onto device -- MNEMONICS
+000e 4f53		;	               K    /4f53    ; f OS Operating system call -- MNEMONICS
+0010 4a50		;	               K    /4a50    ; 0 JP Jump unconditional -- MNEMONICS
+0012 4a5a		;	               K    /4a5a    ; 1 JZ Zero jump -- MNEMONICS
+0014 4a4e		;	               K    /4a4e    ; 2 JN Negative jump -- MNEMONICS
+0016 4c56		;	               K    /4c56    ; 3 LV Value move to accumulator -- MNEMONICS 
+0018 2b20		;	               K    /2b20    ; 4 +  Add -- MNEMONICS
+001a 2d20		;	               K    /2d20    ; 5 -  Subtract -- MNEMONICS
+001c 2a20		;	               K    /2a20    ; 6 *  Multiply -- MNEMONICS
+001e 2f20		;	               K    /2f20    ; 7 /  Divide -- MNEMONICS
+0020 0040		;	               K    /0040    ;   @  ORIGEM
+0022 0023		;	               K    /0023    ;   #  FIM
+0024 004b		;	               K    /004B    ;   K  CONSTANTE
+;
+0026 0008		;	      TCODE    K    /0008    ; 8 LD Load accumulator from memory -- CODE
+0028 0009		;	               K    /0009    ; 9 MM Memorize from accumulator -- CODE
+002a 000a		;	               K    /000A    ; a SC Subroutine call -- CODE
+002c 000b		;	               K    /000B    ; b RS Return from subroutine -- CODE
+002e 000c		;	               K    /000C    ; c HM Halt MVN -- CODE
+0030 000d		;	               K    /000D    ; d GD Get data from device -- CODE
+0032 000e		;	               K    /000E    ; e PD Put data onto device -- CODE
+0034 000f		;	               K    /000F    ; f OS Operating system call -- CODE
+0036 0000		;	               K    /0000    ; 0 JP Jump unconditional  -- CODE
+0038 0001		;	               K    /0001    ; 1 JZ Zero jump -- CODE
+003a 0002		;	               K    /0002    ; 2 JN Negative jump -- CODE
+003c 0003		;	               K    /0003    ; 3 LV Value move to accumulator -- CODE
+003e 0004		;	               K    /0004    ; 4 +  Add -- CODE
+0040 0005		;	               K    /0005    ; 5 -  Subtract -- CODE
+0042 0006		;	               K    /0006    ; 6 *  Multiply -- CODE
+0044 0007		;	               K    /0007    ; 7 /  Divide -- CODE
+0046 0000		;	               K    /0000    ;   @  ORIGEM
+0048 0000		;	               K    /0000    ;   #  FIM
+004a 0000		;	               K    /0000    ;   K  CONSTANTE
+
+;***** ÁREA DE DADOS DA SUBROTINA MTOC *****
+        
+004c 0012		;	        TAMTAB  K   =18      ; comprimento da tabela de mnemônicos-1=19
+004e 0000		;	        PTMNEM   K   TMNEM    ; PONTEIRO PARA TABELA DE MNEMONICOS
+0050 0026		;	        PONTC   K   TCODE    ; PONTEIRO PARA TABELA DE CÓDIGOS
+      
+0052 0000		;	        MNEM     K     /0       ; *** CÓDIGO DO MNEMÔNICO ***
+0054 0000		;	        OPCODE   K     /0       ; *** CÓDIGO DE OPERAÇÃO ***
+0056 0000		;	        INDICE   K     /0       ; ÍNDICE PARA PERCORRER A TABELA 
+
+; ===================================================================
+;***** MTOC - CONVERTE MNEMONICO PARA CÓDIGO DE OPERAÇÃO - ©JJN/2005
+; RECEBE PMNEM - INFORMA O COMPRIMENTO DA TABELA DE MNEMONICOS
+;        PONTM - ENDEREÇO DO INICIO DA TABELA DE MNEMONICOS
+;        PONTC - ENDEREÇO DO INICIO DA TABELA DE CÓDIGOS
+; =======================================================================  RECODIFICADA por DOUGLAS
+
+0058 0000		;	MTOC        K   /0000 ; PONTO DE ENTRADA DE MTOC
+005a 804e		;	LUP         LD  PTMNEM ; Carrega o ponteiro para a tabela de mnemônicos
+005c 4056		;	            +   INDICE
+505e 4002		;	            +   LOAD
+0060 9062		;	            MM  LDMNEM
+0062 0000		;	LDMNEM      K   /0000 ; Carrega o próximo Mnemônico
+0064 5052		;	            -   MNEM  ; Confere se 
+0066 1078		;	            JZ  IGUAL ; é igual ao mnemônico do argumento.
+0068 8056		;	            LD  INDICE
+506a 4001		;	            +   H2
+006c 9056		;	            MM  INDICE
+006e 804c		;	            LD  TAMTAB ; Confere se o índice ultrapassou o equivalente ao tamanho da tabela
+5070 6001		;	            *   H2
+0072 5056		;	            -   INDICE
+0074 2086		;	            JN  ERRO ; Mnemônico não existe na tabela
+0076 005a		;	            JP  LUP
+0078 8050		;	IGUAL       LD  PONTC ; Carrega o ponteiro para a tabela de códigos
+007a 4056		;	            +   INDICE
+507c 4002		;	            +   LOAD
+007e 9080		;	            MM  GETCODE
+0080 0000		;	GETCODE     K   /0000
+0082 9054		;	            MM  OPCODE
+0084 b058		;	            RS  MTOC ; Return
+0086 c086		;	ERRO        HM  ERRO ; Pára a máquina
+

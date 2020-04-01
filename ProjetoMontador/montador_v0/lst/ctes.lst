@@ -1,0 +1,207 @@
+				;	            @     /0000     
+; ==================================================================
+; *** CONSTANTES E ÁREAS DE DADOS - ©JJN/2005
+; ==================================================================
+;
+; SÍMBOLOS EXPORTADOS
+
+009e 0000 ; "LINHA>"		;	LINHA        >
+00a0 0000 ; "LINHA2>"		;	LINHA2       >
+0050 0000 ; "PLINHA>"		;	PLINHA       >
+0042 0000 ; "AUX>"		;	AUX          >
+0044 0000 ; "AUX1>"		;	AUX1         >
+0000 0000 ; "H0>"		;	H0           >
+0002 0000 ; "H1>"		;	H1           >
+0004 0000 ; "H2>"		;	H2           >
+00ac 0000 ; "H2F>"		;	H2F          >
+0006 0000 ; "H4>"		;	H4           >
+0008 0000 ; "H6>"		;	H6           >
+000a 0000 ; "H9>"		;	H9           >
+000c 0000 ; "H0A>"		;	H0A          >
+000e 0000 ; "H30>"		;	H30          >
+0010 0000 ; "H40>"		;	H40          >
+001a 0000 ; "HFF00>"		;	HFF00        >
+0012 0000 ; "H3FFE>"		;	H3FFE        >
+0014 0000 ; "H1000>"		;	H1000        >
+0016 0000 ; "H4000>"		;	H4000        >
+0018 0000 ; "H9000>"		;	H9000        >
+001c 0000 ; "H100>"		;	H100         >
+001e 0000 ; "HFFFF>"		;	HFFFF        >
+0040 0000 ; "HD>"		;	HD           >
+0020 0000 ; "MAXBYTES>"		;	MAXBYTES     >
+0022 0000 ; "MAXSIMB>"		;	MAXSIMB      >
+
+0042 0000 ; "AUX>"		;	AUX          >
+0046 0000 ; "B1>"		;	B1           >
+0048 0000 ; "B2>"		;	B2           >
+004a 0000 ; "CHAR2>"		;	CHAR2        >
+004e 0000 ; "OPERAND>"		;	OPERAND      >
+0052 0000 ; "PTS>"		;	PTS          >
+0054 0000 ; "RTOP>"		;	RTOP         >
+0056 0000 ; "ULTIMO>"		;	ULTIMO       >
+
+003a 0000 ; "LD>"		;	LD          >
+0038 0000 ; "MM>"		;	MM          >
+0024 0000 ; "OP>"		;	OP          >
+0026 0000 ; "RT>"		;	RT          >
+0028 0000 ; "SPC2>"		;	SPC2        >
+002a 0000 ; "SPCPV>"		;	SPCPV       >
+002c 0000 ; "APOST>"		;	APOST       >
+002e 0000 ; "BLANK>"		;	BLANK       >
+0030 0000 ; "BARRA>"		;	BARRA       >
+0032 0000 ; "CRLF>"		;	CRLF        >
+0034 0000 ; "DIG9>"		;	DIG9        >
+004c 0000 ; "IC>"		;	IC          >
+003c 0000 ; "LOAD>"		;	LOAD        >
+003e 0000 ; "STORE>"		;	STORE       >
+0036 0000 ; "NEWLINE>"		;	NEWLINE     >
+
+00a2 0000 ; "LF>"		;	LF           >
+00a4 0000 ; "CR>"		;	CR           >
+00a6 0000 ; "FIM>"		;	FIM          >
+00a8 0000 ; "ORIGEM>"		;	ORIGEM       >
+00aa 0000 ; "DUPDEF>"		;	DUPDEF       >
+00ae 0000 ; "ER>"		;	ER           >
+00b0 0000 ; "RO>"		;	RO           >
+00b2 0000 ; "COLLONB>"		;	COLLONB      >
+
+
+0058 0000 ; "WORD>"		;	WORD        >
+005e 0000 ; "ISB>"		;	ISB         >
+005a 0000 ; "COMMENT>"		;	COMMENT     >
+0060 0000 ; "P1END>"		;	P1END       >
+0062 0000 ; "PARG>"		;	PARG        >
+0064 0000 ; "ARGCNT>"		;	ARGCNT      >
+0066 0000 ; "PARG1>"		;	PARG1       >
+0068 0000 ; "PARG2>"		;	PARG2       >
+006a 0000 ; "PARG3>"		;	PARG3       >
+006c 0000 ; "EOL>"		;	EOL         >
+005c 0000 ; "EOF>"		;	EOF         >
+0096 0000 ; "STI>"		;	STI         >
+0098 0000 ; "STE>"		;	STE         >
+009a 0000 ; "PST>"		;	PST         >
+009c 0000 ; "ADDRI>"		;	ADDRI       >
+00b4 0000 ; "ARR>"		;	ARR         >
+00b6 0000 ; "ECOM>"		;	ECOM        >
+00b8 0000 ; "CIFRA>"		;	CIFRA       >
+00ba 0000 ; "CONT>"		;	CONT       >
+
+; ***  CONSTANTES NUMÉRICAS E MÁSCARAS  ***
+0000 0000		;	    H0       K     /0       ; ZERO
+0002 0001		;	    H1       K     /1       ; UM
+0004 0002		;	    H2       K     /2       ; DOIS
+0006 0004		;	    H4       K     /4       ; QUATRO
+0008 0006		;	    H6       K     /6       ;_aqui_ SEIS
+000a 0009		;	    H9       K     /9
+000c 000a		;	    H0A      K     /A
+000e 0030		;	    H30      K     /30
+0010 0040		;	    H40      K     /40
+0012 3ffe		;	    H3FFE    K     /3FFE    ;_aqui_ 3FFE
+0014 1000		;	    H1000    K     /1000    ;_aqui_ 1000
+0016 4000		;	    H4000    K     /4000    ;_aqui_ 4000
+0018 9000		;	    H9000    K     /9000    ;_aqui_ 9000
+001a ff00		;	    HFF00    K     /FF00    ; -(/80 * /80)
+001c 0100		;	    H100     K     /0100    ; /100 = 2**8
+001e ffff		;	    HFFFF    K     /FFFF    ;-1
+0020 0050		;	    MAXBYTES K     /50      ; COMPRIMENTO DA LINHA=80
+0022 0100		;	    MAXSIMB  K     /100     ; 128 SÍMBOLOS NO MÁXIMO
+;ERRO:Dupla definição(220)    MNEM     K     /0       ; MNEMÔNICO DA INSTRUÇÃO(2 CARACT.)
+0024 ffff		;	    OP       K     /FFFF    ; OPERANDO = -1
+;ERRO:Dupla definição(196)    OPCODE   K     /0       ; CÓDIGO DE OPERAÇÃO DA INSTRUÇÃO
+;ERRO:Dupla definição (195)    OPERAND  K     /0       ; OPERANDO DA INSTRUÇÃO
+0026 0000		;	    RT       K     /0       ; RÓTULO = 0
+0028 2020		;	    SPC2     K     /2020    ; DOIS ESPAÇOS
+002a 202c		;	    SPCPV    K     /202C    ; ESPAÇO E PONTO-E-VÍRGULA
+;
+; *** CONSTANTES ASCII E SIMILARES ***
+002c 0027		;	    APOST    K     /0027    ; APÓSTROFE-BARRA
+002e 2020		;	    BLANK    K     /2020    ; ESPAÇO
+0030 002f		;	    BARRA    K     /002F    ; BARRA
+0032 0d0a		;	    CRLF     K     /0D0A    ; FIM DE LINHA
+0034 0012		;	    DIG9     K     /12      ; (NOVE ASCII=/39)-(APÓSTROFE=/27)
+0036 200a		;	    NEWLINE  K     /200A    ; " \n"
+;
+; *** MÁSCARAS PARA A CONSTRUÇÃO DE INSTRUÇÕES
+0038 909e		;	    MM       MM    LINHA    ;" MÁSCARA P/ MONTAR ""STA LINHA[X]"""
+003a 809e		;	    LD       LD    LINHA    ;" MÁSCARA P/ MONTAR ""LDA LINHA[X]"""
+    
+003c 8000		;	    LOAD     LD    /0000    ; CODIGO DE OPERAÇÃO LOAD
+003e 9000		;	    STORE    MM    /0000    ; CÓDIGO DE OPERAÇÃO MOVE MEMORY
+0040 d000		;	    HD       GD    /0000
+; ***  VARIÁVEIS  ***
+0042 0000		;	    AUX      K     /0       ; VARIÁVEL AUXILIAR
+0044 0000		;	    AUX1     K     /0       ;_aqui_ adicionado por Douglas
+0046 0000		;	    B1       K     /0       ; BYTE ESQUERDO
+0048 0000		;	    B2       K     /0       ; BYTE DIREITO
+004a 0000		;	    CHAR2    K     /0000    ; DOIS CARACTERES ASCII LIDOS
+004c 0000		;	    IC       K     /0       ; CONTADOR DE INSTRUÇÕES
+004e 0000		;	    OPERAND  K     /0       ; *** OPERANDO ***
+0050 0000		;	    PLINHA   K     /0       ; PONTEIRO PARA LINHA (CURSOR)
+0052 0000		;	    PTS      K     /0       ; PONTEIRO PARA TAB. DE SIMB.(CURSOR)
+0054 0000		;	    RTOP     K     /0       ; RÓTULO (0) OU OPERANDO (-1)
+0056 0000		;	    ULTIMO   K     /0       ; ULTIMO SIMBOLO NA T.S.
+
+    ;READLINE
+0058 0000		;	    WORD      K     /0
+005a 203b		;	    COMMENT   K     /203B
+005c 2023		;	    EOF       K     /2023
+005e 0000		;	    ISB       K     /0
+0060 0000		;	    P1END     K     /0
+0062 0000		;	    PARG      K     /0000
+0064 0000		;	    ARGCNT    K     /0
+0066 0000		;	    PARG1     K     /0
+0068 0000		;	    PARG2     K     /0
+006a 0000		;	    PARG3     K     /0
+006c 200a		;	    EOL       K     /200A 
+006e 0000		;	    SYMBTAB   $     =10    0
+0070 0000		;	    SYMBTAB   $     =10    2
+0072 0000		;	    SYMBTAB   $     =10    4
+0074 0000		;	    SYMBTAB   $     =10    6
+0076 0000		;	    SYMBTAB   $     =10    8
+0078 0000		;	    SYMBTAB   $     =10    a
+007a 0000		;	    SYMBTAB   $     =10    c
+007c 0000		;	    SYMBTAB   $     =10    e
+007e 0000		;	    SYMBTAB   $     =10    10
+0080 0000		;	    SYMBTAB   $     =10    12
+				;	    SYMBTAB   $     =10 
+0082 0000		;	    ADDRTAB   $     =10   0
+0084 0000		;	    ADDRTAB   $     =10   2
+0086 0000		;	    ADDRTAB   $     =10   4
+0088 0000		;	    ADDRTAB   $     =10   6
+008a 0000		;	    ADDRTAB   $     =10   8
+008c 0000		;	    ADDRTAB   $     =10   a
+008e 0000		;	    ADDRTAB   $     =10   c
+0090 0000		;	    ADDRTAB   $     =10   e
+0092 0000		;	    ADDRTAB   $     =10   10
+0094 0000		;	    ADDRTAB   $     =10   12
+				;	    ADDRTAB   $     =10
+0096 006e		;	    STI       K     SYMBTAB
+0098 0096		;	    STE       K     STI
+009a 0000		;	    PST       K     /0
+009c 0082		;	    ADDRI     K     ADDRTAB
+
+
+
+;
+;** ÁREAS DE DADOS ***
+009e 0000		;	    LINHA    K    /0       ; 80 PALAVRAS PARA UMA LINHA-FONTE
+00a0 0000		;	    LINHA2   K    /0       ; AO TODO
+;             @    /94     ; RESERVA /50 PALAVRAS;
+;
+;** MISCELANEA *** MUDAR DE LUGAR POSTERIORMENTE ***
+00a2 000a		;	    LF       K    /0A      ; LINE FEED
+00a4 000d		;	    CR       K    /0D      ; CARRIAGE RETURN
+00a6 0023		;	    FIM      K    /0023    ; SUSTENIDO
+00a8 001d		;	    ORIGEM   K    /001D    ; (ARROBA=/40) - (SUSTENIDO=/23)
+00aa 4444		;	    DUPDEF   K    /4444    ;" DUPLA DEFINIÇÃO DE SÍMBOLO = ""DD"""
+00ac 002f		;	    H2F      K    /002F    ;" (""0"" = /30) - 1"
+00ae 4552		;	    ER       K    /4552    ;" ""ER"""
+00b0 524f		;	    RO       K    /524F    ;" ""RO"""
+00b2 3a20		;	    COLLONB  K    /3A20    ; DOIS PONTOS, BRANCO
+00b4 0040		;	    ARR      K    '@
+00b6 0026		;	    ECOM     K    '&
+00b8 0024		;	    CIFRA    K    '$
+
+00ba 0000		;	    CONT     K    /0000
+
+

@@ -1,0 +1,402 @@
+; -------------------------------------------------------------------
+; Programa principal do Monitor Batch Simples (MBS)
+; -------------------------------------------------------------------
+; Coloque aqui os símbolos importados
+; -------------------------------------------------------------------
+
+4000 0000 ; "DUMPER<"		;	DUMPER     <
+4001 0000 ; "DUMP_INI<"		;	DUMP_INI   <
+4002 0000 ; "DUMP_TAM<"		;	DUMP_TAM   <
+4003 0000 ; "DUMP_UL<"		;	DUMP_UL    <
+4004 0000 ; "DUMP_BL<"		;	DUMP_BL    <
+4005 0000 ; "DUMP_EXE<"		;	DUMP_EXE   <
+4006 0000 ; "LOADER<"		;	LOADER     <
+4007 0000 ; "LOADER_UL<"		;	LOADER_UL  <
+4008 0000 ; "GETP<"		;	GETP       <
+2002 0000 ; "UL>"		;	UL         >
+200a 0000 ; "SENHA>"		;	SENHA      >
+2004 0000 ; "GET>"		;	GET        >
+2008 0000 ; "PSENHA>"		;	PSENHA     >
+
+; Origem relocável
+				;	                &       /0000
+
+a000 00f0		;	MAIN            JP      INI      ; salta para o início do programa
+8002 0000		;	UL              K       /0000    ; parâmetro: UL onde está o arquivo de batch
+8004 d000		;	GET             K       /D000
+8006 0300		;	DISCO           K       /0300
+8008 000a		;	PSENHA          K       SENHA
+800a 4341		;	SENHA           K       /4341
+800c 4445		;	                K       /4445
+800e 4535		;	                K       /4535
+8010 3545		;	                K       /3545
+8012 4230		;	                K       /4230
+8014 4445		;	                K       /4445
+8016 0000		;	                K       /0000
+8018 0000		;	                K       /0000
+; -------------------------------------------------------------------
+; Subrotina: UNPACK
+; Extrai os bytes de uma word contida no acumulador, colocando-os
+; em dois endereços da memória.
+;
+; Exemplo: dada a word XYZT no acumulador, ao final da execução,
+; UNP_B1="00XY" e UNP_B2="00ZT".
+; -------------------------------------------------------------------
+
+; Parâmetros
+801a 0000		;	WORD            $       /0001       ; Word de entrada   0
+				;	WORD            $       /0001       ; Word de entrada
+801c 0000		;	UNP_B1          $       /0001       ; Byte mais significativo   0
+				;	UNP_B1          $       /0001       ; Byte mais significativo
+801e 0000		;	UNP_B2          $       /0001       ; Byte menos significativo   0
+				;	UNP_B2          $       /0001       ; Byte menos significativo
+
+; Constantes
+8020 0100		;	SHIFT           K       /0100
+8022 0030		;	CH_0            K       /0030
+8024 0046		;	CH_F            K       /0046
+8026 003a		;	X_INI           K       /003A
+8028 0041		;	X_END           K       /0041
+802a 0007		;	X_DIFF          K       /0007
+802c 0001		;	ONE             K       /0001
+802e ffff		;	MINUS_1         K       /FFFF
+8030 0000		;	ZERO            K       /0000
+8032 1000		;	EIGHT           K       /1000
+8034 0100		;	FOUR            K       /0100
+8036 0010		;	TWO             K       /0010
+
+; Corpo da subrotina
+8038 0000		;	UNPACK          $       /0001   0
+				;	UNPACK          $       /0001
+a03a 901a		;	                MM      WORD        ; Carrega word. Primeiramente faremos unpack de B2
+a03c 6020		;	                *       SHIFT       ; Desloca os bytes para remover 2 primeiros hex
+a03e a04e		;	                SC      RSHIFT2     ; Desloca os bytes menos significativos pro seu lugar
+a040 901e		;	                MM      UNP_B2      ; Salva resultado
+a042 801a		;	                LD      WORD        ;
+a044 a04e		;	                SC      RSHIFT2     ;
+a046 901c		;	                MM      UNP_B1      ;
+a048 b038		;	                RS      UNPACK      ; Retorna
+
+; -------------------------------------------------------------------
+; Subrotina: RSHIFT2
+; Faz um right shift (<) duas vezes do valor do acumulador
+; -------------------------------------------------------------------
+
+; Constantes
+804a 8000		;	FIX             K       /8000
+804c 0080		;	REFIX           K       /0080
+; Corpo da subrotina
+804e 0000		;	RSHIFT2         $       /0001   0
+				;	RSHIFT2         $       /0001
+a050 2056		;	                JN      NEG         ; O número é negativo
+a052 7020		;	                /       SHIFT       ; Retorna os 2 bytes à posição inicial
+a054 005c		;	                JP      FIM-RS      ; Vai para final de RSHIFT2
+a056 504a		;	NEG             -       FIX         ; Fix do shift em número negativo
+a058 7020		;	                /       SHIFT       ; Shift
+a05a 404c		;	                +       REFIX       ; Fix para voltar número tirado
+a05c b04e		;	FIM-RS          RS      RSHIFT2     ; Retorno
+
+; -------------------------------------------------------------------
+; Subrotina: IS_HEX
+; -------------------------------------------------------------------
+
+  ;; Parâmetros
+805e 0000		;	S_HEX           $       /0001   0
+				;	S_HEX           $       /0001
+  ;; Corpo da subrotina
+8060 0000		;	IS_HEX          $       /0001   0
+				;	IS_HEX          $       /0001
+a062 905e		;	                MM      S_HEX
+  ;; Verifica se < '0'
+a064 5022		;	                -       CH_0
+a066 2070		;	                JN      NOT_HEX
+  ;; Verifica se > 'f'
+a068 805e		;	                LD      S_HEX
+a06a 5024		;	                -       CH_F
+a06c 502c		;	                -       ONE ; we wanna include 'f'
+a06e 2074		;	                JN      MIGHTB
+  ;; Não é hex. Retorna -1.
+a070 802e		;	NOT_HEX         LD      MINUS_1
+a072 b060		;	                RS      IS_HEX
+  ;; Incrementa CH_F decrementado e verifica se é caractere especial.
+a074 805e		;	MIGHTB          LD      S_HEX
+a076 5026		;	                -       X_INI
+a078 2084		;	                JN      YES_HEX
+a07a 502a		;	                -       X_DIFF
+a07c 2070		;	                JN      NOT_HEX
+a07e 805e		;	                LD      S_HEX
+a080 502a		;	                -       X_DIFF
+a082 b060		;	                RS      IS_HEX
+a084 805e		;	YES_HEX         LD      S_HEX
+a086 b060		;	                RS      IS_HEX
+
+; -------------------------------------------------------------------
+; Subrotina: CHTOI
+; Converte uma word em hexa para um número inteiro.
+;
+; Exemplo: CHTOI("0010") = 0010 (i.e., 16 em decimal)
+; -------------------------------------------------------------------
+
+  ;; Parâmetros
+8088 0000		;	CH_ANS          $       /0001        ; Variável para guardar resultado   0
+				;	CH_ANS          $       /0001        ; Variável para guardar resultado
+808a 0000		;	CH_IN_A         $       /0001        ; 2 bytes mais significativos (em ASCII)   0
+				;	CH_IN_A         $       /0001        ; 2 bytes mais significativos (em ASCII)
+808c 0000		;	CH_IN_B         $       /0001        ; 2 bytes menos signicativos (em ASCII)   0
+				;	CH_IN_B         $       /0001        ; 2 bytes menos signicativos (em ASCII)
+
+  ;; Corpo da subrotina
+808e 0000		;	CHTOI           $       /0001   0
+				;	CHTOI           $       /0001
+  ;; Zera CH_ANS
+a090 8030		;	                LD      ZERO
+a092 9088		;	                MM      CH_ANS
+  ;; Unpack primeira palavra
+a094 808a		;	                LD      CH_IN_A
+a096 901a		;	                MM      WORD
+a098 a038		;	                SC      UNPACK
+  ;; Processa primeira palavra
+  ;; Processa primeiro byte
+a09a 801c		;	                LD      UNP_B1
+a09c a060		;	                SC      IS_HEX
+a09e 20d4		;	                JN      CH_RET
+a0a0 5022		;	                -       CH_0
+a0a2 6032		;	                *       EIGHT
+a0a4 9088		;	                MM      CH_ANS
+  ;; Processa segundo byte
+a0a6 801e		;	                LD      UNP_B2
+a0a8 a060		;	                SC      IS_HEX
+a0aa 20d4		;	                JN      CH_RET
+a0ac 5022		;	                -       CH_0
+a0ae 6034		;	                *       FOUR
+a0b0 4088		;	                +       CH_ANS
+a0b2 9088		;	                MM      CH_ANS
+  ;; Unpack segunda palavra
+a0b4 808c		;	                LD      CH_IN_B
+a0b6 901a		;	                MM      WORD
+a0b8 a038		;	                SC      UNPACK
+  ;; Processa segunda palavra
+  ;; Processa primeiro byte
+a0ba 801c		;	                LD      UNP_B1
+a0bc a060		;	                SC      IS_HEX
+a0be 20d4		;	                JN      CH_RET
+a0c0 5022		;	                -       CH_0
+a0c2 6036		;	                *       TWO
+a0c4 4088		;	                +       CH_ANS
+a0c6 9088		;	                MM      CH_ANS
+  ;; Processa segundo byte
+a0c8 801e		;	                LD      UNP_B2
+a0ca a060		;	                SC      IS_HEX
+a0cc 20d4		;	                JN      CH_RET
+a0ce 5022		;	                -       CH_0
+a0d0 4088		;	                +       CH_ANS
+  ;; Valor da resposta está no acumulador!
+a0d2 9088		;	                MM      CH_ANS
+a0d4 b08e		;	CH_RET          RS      CHTOI
+;==========================================
+;Variáveis e constantes
+;==========================================
+80d6 4750		;	GP              K /4750 ; GP em ASCII
+80d8 4c4f		;	LO              K /4C4F ; LO em ASCII
+80da 4455		;	DU              K /4455 ; DU em ASCII
+80dc 2f2a		;	TKFIM           K /2F2A ; /* em ASCII
+80de 0aff		;	EOF             K /0AFF ; END OF FILE
+80e0 2f2f		;	BARRAS2         K /2F2F ; // em ASCII
+80e2 4a42		;	TKJOB           K /4A42 ; JB em ASCII
+80e4 0a0a		;	PULA            K /0A0A ; \n\n
+80e6 2020		;	ESPACO          K /2020 ; BB
+80e8 2f0a		;	ERFIM           K /2F0A
+80ea 3030		;	ZEROZERO        K /3030
+80ec 0000		;	AUX             K /0000
+;
+80ee 0000		;	                K       /0000
+a0f0 a236		;	INI             SC PEGADADO
+a0f2 a174		;	                SC CHECABARRA
+a0f4 113c		;	                JZ ERROJOB
+a0f6 a182		;	                SC CHECAJOB
+a0f8 113c		;	                JZ ERROJOB
+a0fa a236		;	LOOP            SC PEGADADO         ;Le os pula-linhas
+a0fc a236		;					SC PEGADADO                
+a0fe 50dc		;	                -  TKFIM
+a100 1172		;	                JZ FIM
+a102 40dc		;	                +  TKFIM
+a104 50de		;	                -  EOF
+a106 115a		;	                JZ ERROEND
+a108 40de		;	                +  EOF
+a10a 90ec		;	                MM AUX
+a10c a174		;	                SC CHECABARRA
+a10e 1164		;	                JZ ERROTRATA
+a110 a236		;	                SC PEGADADO
+a112 50d8		;	                -  LO
+a114 1130		;	                JZ OPLOAD
+a116 40d8		;	                + LO
+a118 50da		;	                - DU
+a11a 1136		;	                JZ OPDUMP
+a11c 40da		;	                + DU
+a11e 50d6		;	                - GP
+a120 1124		;	                JZ CHAMAGP
+a122 012e		;	                JP PULA2
+a124 a236		;	CHAMAGP         SC PEGADADO
+d126 a008		;	                SC GETP
+a128 112c		;	                JZ ERROSENHA
+a12a 00fa		;	                JP LOOP
+a12c 0172		;	ERROSENHA       JP FIM
+a12e 0146		;	PULA2            JP ERROCMD
+a130 a21e		;	OPLOAD          SC TRATALOAD
+a132 2150		;	                JN ERROARG
+a134 00fa		;	                JP LOOP
+a136 a1ae		;	OPDUMP          SC TRATADUMP
+a138 2150		;	                JN ERROARG
+a13a 00fa		;	                JP LOOP
+813c 3001		;	ERROJOB         LV /0001
+813e f0ee		;	                OS /0EE
+8140 304a		;	                LV /004A ; J
+8142 e100		;	                PD /100
+a144 0172		;	                JP FIM
+8146 3002		;	ERROCMD         LV /0002
+8148 f0ee		;	                OS /0EE
+814a 3043		;	                LV /0043 ; C
+814c e100		;	                PD /100
+a14e 0172		;	                JP FIM
+8150 3003		;	ERROARG         LV /0003
+8152 f0ee		;	                OS /0EE
+8154 3041		;	                LV /0041 ; A
+8156 e100		;	                PD /100
+a158 0172		;	                JP FIM
+815a 3004		;	ERROEND         LV /0004
+815c f0ee		;	                OS /0EE
+815e 3044		;	                LV /0044 ; D
+8160 e100		;	                PD /100
+a162 0172		;	                JP FIM
+a164 80ec		;	ERROTRATA       LD AUX
+a166 50e8		;	                -  ERFIM
+a168 115a		;	                JZ ERROEND
+a16a 40e8		;	                + ERFIM
+a16c 50ea		;	                - ZEROZERO  
+a16e 1150		;	                JZ ERROARG
+a170 0146		;	                JP ERROCMD
+a172 c172		;	FIM             HM      FIM   ; Fim do programa
+;
+;ChecaBarra
+;
+8174 0000		;	CHECABARRA      K  /0000
+a176 50e0		;	                -  BARRAS2
+a178 117e		;	                JZ OKBARRA
+817a 3000		;	                LV /000
+a17c 0180		;	                JP FIMBARRA
+817e 3001		;	OKBARRA         LV /0001
+a180 b174		;	FIMBARRA             RS CHECABARRA
+;
+;CHECAJOB
+;
+8182 0000		;	CHECAJOB        K /0000
+a184 a236		;	                SC PEGADADO
+a186 50e2		;	                -  TKJOB
+a188 118e		;	                JZ CERTOJOB
+818a 3000		;	                LV /0000
+a18c 0190		;	                JP FIMJOB
+818e 3001		;	CERTOJOB        LV /0001
+a190 b182		;	FIMJOB          RS CHECAJOB
+;
+;CHECA PULA
+;
+8192 0000		;	CHECAPULA       K /0000
+a194 50e4		;	                - PULA
+a196 119c		;	                JZ CERTOPULA
+8198 3000		;	                LV /0000
+a19a 019e		;	                JP FIMPULA
+819c 3001		;	CERTOPULA       LV /0001
+a19e b192		;	FIMPULA         RS CHECAPULA
+;
+;CHECA ESPAÇO
+81a0 0000		;	CHECAESPACO     K /0000
+a1a2 50e6		;	                - ESPACO
+a1a4 11aa		;	                JZ CERTOESPACO
+81a6 3000		;	                LV /0000
+a1a8 01ac		;	                JP FIMESPACO
+81aa 3001		;	CERTOESPACO     LV /0001
+a1ac b1a0		;	FIMESPACO       RS CHECAESPACO
+;
+;TRATADUMP
+;
+81ae 0000		;	TRATADUMP       K /0000
+a1b0 a236		;	                SC PEGADADO ; Le o pula linha
+a1b2 a192		;	                SC CHECAPULA
+a1b4 1146		;	                JZ ERROCMD
+a1b6 a236		;	                SC PEGADADO
+a1b8 908a		;	                MM CH_IN_A
+a1ba a236		;	                SC PEGADADO
+a1bc 908c		;	                MM CH_IN_B
+a1be a08e		;	                SC CHTOI
+a1c0 8088		;	                LD CH_ANS
+d1c2 9004		;	                MM DUMP_BL ; Tamanho do bloco
+a1c4 a236		;	                SC PEGADADO ; ESPACO EM BRANCO
+a1c6 a1a0		;	                SC CHECAESPACO
+a1c8 1150		;	                JZ ERROARG
+a1ca a236		;	                SC PEGADADO
+a1cc 908a		;	                MM CH_IN_A
+a1ce a236		;	                SC PEGADADO
+a1d0 908c		;	                MM CH_IN_B
+a1d2 a08e		;	                SC CHTOI
+a1d4 8088		;	                LD CH_ANS
+d1d6 9001		;	                MM DUMP_INI ; End. inicial
+a1d8 a236		;	                SC PEGADADO
+a1da a1a0		;	                SC CHECAESPACO
+a1dc 1150		;	                JZ ERROARG
+a1de a236		;	                SC PEGADADO
+a1e0 908a		;	                MM CH_IN_A
+a1e2 a236		;	                SC PEGADADO
+a1e4 908c		;	                MM CH_IN_B
+a1e6 a08e		;	                SC CHTOI
+a1e8 8088		;	                LD CH_ANS
+d1ea 9002		;	                MM DUMP_TAM ; Tamanho total
+a1ec a236		;	                SC PEGADADO
+a1ee a1a0		;	                SC CHECAESPACO
+a1f0 1150		;	                JZ ERROARG
+a1f2 a236		;	                SC PEGADADO
+a1f4 908a		;	                MM CH_IN_A
+a1f6 a236		;	                SC PEGADADO
+a1f8 908c		;	                MM CH_IN_B
+a1fa a08e		;	                SC CHTOI
+a1fc 8088		;	                LD CH_ANS
+d1fe 9005		;	                MM DUMP_EXE ; End. da 1 inst
+a200 a236		;					SC PEGADADO
+a202 a1a0		;	                SC CHECAESPACO
+a204 1150		;	                JZ ERROARG
+a206 a236		;	                SC PEGADADO
+a208 908a		;	                MM CH_IN_A
+a20a a236		;	                SC PEGADADO
+a20c 908c		;	                MM CH_IN_B
+a20e a08e		;	                SC CHTOI
+a210 8088		;	                LD CH_ANS
+d212 9003		;					MM DUMP_UL ; Unidade lógica
+d214 a000		;	                SC DUMPER
+8216 3000		;	                LV /0000
+a218 021c		;	                JP FIMOPDUMP
+821a 3fff		;	ERRO            LV /FFF
+a21c b1ae		;	FIMOPDUMP       RS TRATADUMP
+;
+;TRATALOAD
+;
+821e 0000		;	TRATALOAD       K /0000
+a220 a236		;	                SC PEGADADO
+a222 a236		;	                SC PEGADADO
+a224 908a		;	                MM CH_IN_A
+a226 a236		;	                SC PEGADADO
+a228 908c		;	                MM CH_IN_B
+a22a a08e		;	                SC CHTOI
+a22c 8088		;	                LD CH_ANS
+d22e 9007		;	                MM LOADER_UL
+d230 a006		;	                SC LOADER
+8232 3000		;	                LV /0000
+a234 b21e		;	                RS TRATALOAD
+;
+;
+;
+8236 0000		;	PEGADADO        K /0000
+a238 8004		;	                LD GET
+a23a 4002		;	                +  UL
+a23c 4006		;	                + DISCO
+a23e 9240		;	                MM INST1
+8240 0000		;	INST1           K /0000
+a242 b236		;	                RS PEGADADO

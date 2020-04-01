@@ -1,0 +1,127 @@
+; -------------------------------------------------------------------
+; Loader
+; -------------------------------------------------------------------
+
+; Símbolos exportados
+; -------------------------------------------------------------------
+2020 0000 ; "LOADER>"		;	LOADER      >
+201e 0000 ; "LOADER_UL>"		;	LOADER_UL   >
+
+; Origem relocável
+				;	                &       /0000
+
+; Constantes
+8000 0001		;	UM           K          /0001
+8002 0002		;	DOIS         K          /0002
+8004 d300		;	GD_OP        K          /D300
+8006 9000		;	SAVE_OP      K          /9000
+8008 0fff		;	END_LIMITE   K          /0FFF
+800a fffe		;	ERROR_TAM    K          /FFFE
+800c fffc		;	ERROR_SUM    K          /FFFC
+
+; Variáveis
+800e 0000		;	END_INICIAL  $          /0001   0
+				;	END_INICIAL  $          /0001
+8010 0000		;	TAM          $          /0001   0
+				;	TAM          $          /0001
+8012 0000		;	DOIS_TAM     $          /0001   0
+				;	DOIS_TAM     $          /0001
+8014 0000		;	COUNT        $          /0001   0
+				;	COUNT        $          /0001
+8016 0000		;	COUNT2       $          /0001   0
+				;	COUNT2       $          /0001
+8018 0000		;	COUNT3       $          /0001   0
+				;	COUNT3       $          /0001
+801a 0000		;	DADO_LIDO    $          /0001   0
+				;	DADO_LIDO    $          /0001
+801c 0000		;	CHECKSUM     $          /0001   0
+				;	CHECKSUM     $          /0001
+
+; Parâmetros
+801e 0000		;	LOADER_UL    $          /0001   0
+				;	LOADER_UL    $          /0001
+8020 0000		;	LOADER       $          /0001   0
+				;	LOADER       $          /0001
+
+a022 8004		;	             LD         GD_OP
+a024 401e		;	             +          LOADER_UL
+a026 9034		;	             MM         DO_GD_1
+a028 9038		;	             MM         DO_GD_2
+a02a 9058		;	             MM         DO_GD_3
+a02c 9060		;	             MM         DO_GD_4
+a02e 9082		;	             MM         DO_GD_5
+a030 9092		;	             MM         FIM2
+a032 90a4		;	             MM         SAI_NORMAL
+
+; Load da posição inicial e do tamanho
+8034 0000		;	DO_GD_1      $          /0001   0
+				;	DO_GD_1      $          /0001
+a036 900e		;	             MM         END_INICIAL
+8038 0000		;	DO_GD_2      $          /0001   0
+				;	DO_GD_2      $          /0001
+a03a 9010		;	             MM         TAM
+a03c 6002		;	             *          DOIS
+a03e 9012		;	             MM         DOIS_TAM
+
+; Cálculo de erro
+a040 8008		;	             LD         END_LIMITE
+a042 500e		;	             -          END_INICIAL
+a044 4000		;	             +          UM
+a046 5012		;	             -          DOIS_TAM
+a048 20a0		;	             JN         SAI_ERROR_TAM
+
+; Cabe na memória, então: loop
+804a 3000		;	                LV      /0000
+a04c 9014		;	                MM      COUNT
+a04e 8014		;	LOOP            LD      COUNT
+a050 5012		;	                -       DOIS_TAM
+a052 10a4		;	                JZ      SAI_NORMAL
+8054 3000		;	                LV      /0000
+a056 901c		;	                MM      CHECKSUM
+8058 0000		;	DO_GD_3         $       /0001                 ; Endereço inicial   0
+				;	DO_GD_3         $       /0001                 ; Endereço inicial
+a05a 900e		;	                MM      END_INICIAL
+a05c 401c		;	                +       CHECKSUM
+a05e 901c		;	                MM      CHECKSUM
+8060 0000		;	DO_GD_4         $       /0001                 ; Tamanho do bloco   0
+				;	DO_GD_4         $       /0001                 ; Tamanho do bloco
+a062 9016		;	                MM      COUNT2
+a064 9018		;	                MM      COUNT3
+a066 401c		;	                +       CHECKSUM
+a068 901c		;	                MM      CHECKSUM
+a06a 8016		;	                LD      COUNT2
+a06c 6002		;	                *       DOIS
+a06e 4014		;	                +       COUNT
+a070 9014		;	                MM      COUNT
+a072 8016		;	LOOP2           LD      COUNT2
+a074 1092		;	                JZ      FIM2
+a076 8018		;	                LD      COUNT3                ; Calcula endereço de leitura
+a078 5016		;	                -       COUNT2
+a07a 6002		;	                *       DOIS
+a07c 400e		;	                +       END_INICIAL
+a07e 4006		;	                +       SAVE_OP
+a080 9084		;	                MM      SAVE_DATA
+8082 0000		;	DO_GD_5         $       /0001   0
+				;	DO_GD_5         $       /0001
+8084 0000		;	SAVE_DATA       $       /0001   0
+				;	SAVE_DATA       $       /0001
+a086 401c		;	                +       CHECKSUM
+a088 901c		;	                MM      CHECKSUM
+a08a 8016		;	                LD      COUNT2
+a08c 5000		;	                -       UM
+a08e 9016		;	                MM      COUNT2
+a090 0072		;	                JP      LOOP2
+8092 0000		;	FIM2            $       /0001                 ; Verifica checksum   0
+				;	FIM2            $       /0001                 ; Verifica checksum
+a094 501c		;	                -       CHECKSUM
+a096 109a		;	                JZ      SUM_OK
+a098 009c		;	                JP      WRONGSUM
+a09a 004e		;	SUM_OK          JP      LOOP
+a09c 800c		;	WRONGSUM        LD      ERROR_SUM
+a09e b020		;	                RS      LOADER
+a0a0 800a		;	SAI_ERROR_TAM   LD      ERROR_TAM
+a0a2 b020		;	                RS      LOADER
+80a4 0000		;	SAI_NORMAL      $       /0001   0
+				;	SAI_NORMAL      $       /0001
+a0a6 b020		;	                RS      LOADER
+

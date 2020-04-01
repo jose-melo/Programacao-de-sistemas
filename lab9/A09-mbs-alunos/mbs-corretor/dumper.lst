@@ -1,0 +1,123 @@
+; -------------------------------------------------------------------
+; Dumper
+; -------------------------------------------------------------------
+
+; Símbolos exportados
+; -------------------------------------------------------------------
+201e 0000 ; "DUMPER>"		;	DUMPER          >
+2000 0000 ; "DUMP_INI>"		;	DUMP_INI        >
+2002 0000 ; "DUMP_TAM>"		;	DUMP_TAM        >
+2004 0000 ; "DUMP_UL>"		;	DUMP_UL         >
+2006 0000 ; "DUMP_BL>"		;	DUMP_BL         >
+2008 0000 ; "DUMP_EXE>"		;	DUMP_EXE        >
+
+; Origem relocável
+				;	                &       /0000
+
+; Parâmetros do dumper
+8000 0000		;	DUMP_INI        $       /0001  ; Endereço inicial de dump   0
+				;	DUMP_INI        $       /0001  ; Endereço inicial de dump
+8002 0000		;	DUMP_TAM        $       /0001  ; Tamanho total da imagem   0
+				;	DUMP_TAM        $       /0001  ; Tamanho total da imagem
+8004 0000		;	DUMP_UL         $       /0001  ; Número da unidade lógica   0
+				;	DUMP_UL         $       /0001  ; Número da unidade lógica
+8006 0000		;	DUMP_BL         $       /0001  ; Comprimento do bloco (em words)   0
+				;	DUMP_BL         $       /0001  ; Comprimento do bloco (em words)
+8008 0000		;	DUMP_EXE        $       /0001  ; Endereço da primeira instrução executável   0
+				;	DUMP_EXE        $       /0001  ; Endereço da primeira instrução executável
+
+; Variáveis
+800a 0000		;	COUNT           $       /0001   0
+				;	COUNT           $       /0001
+800c 0000		;	COUNT2          $       /0001   0
+				;	COUNT2          $       /0001
+800e 0000		;	COUNT3          $       /0001   0
+				;	COUNT3          $       /0001
+8010 0000		;	CHECKSUM        $       /0001   0
+				;	CHECKSUM        $       /0001
+8012 8000		;	LOAD            K       /8000  ; Opcode de LOAD
+8014 0000		;	INICIO          K       /0000
+8016 0800		;	TAM             K       /0800
+8018 0001		;	ONE             K       /0001  ; Constante
+801a 0002		;	TWO             K       /0002  ; Constante
+801c e300		;	PD_OP           K       /E300  ; Opcode de PD (Put Data) em disco
+
+; Corpo da subrotina
+801e 0000		;	DUMPER          $       /0001   0
+				;	DUMPER          $       /0001
+
+; Definindo PD_OP a partir de DUMP_UL
+a020 8004		;	                LD      DUMP_UL
+a022 401c		;	                +       PD_OP
+a024 907c		;	                MM      WRITE
+a026 9034		;	                MM      WRITE2
+a028 9038		;	                MM      WRITE3
+a02a 904a		;	                MM      WRITE4
+a02c 905e		;	                MM      WRITE5
+a02e 908c		;	                MM      WRITE6
+a030 9098		;	                MM      WRITE7
+
+; Escrevendo endereço inicial e tamanho
+a032 8000		;	                LD      DUMP_INI
+8034 0000		;	WRITE2          $       /0001   0
+				;	WRITE2          $       /0001
+a036 8002		;	                LD      DUMP_TAM
+8038 0000		;	WRITE3          $       /0001   0
+				;	WRITE3          $       /0001
+
+; Dump da memória
+a03a 800a		;	LOOP            LD      COUNT        ; Carrega o num. de words que já foram escritas
+a03c 5002		;	                -       DUMP_TAM     ; Subtrai o tamanho total do arquivo
+a03e 1096		;	                JZ      FIM          ; if (COUNT == DUMP_TAM) goto FIM;
+8040 3000		;	                LV      /0000        ; Zera o acumulador
+a042 9010		;	                MM      CHECKSUM     ; CHECKSUM = 0
+a044 800a		;	                LD      COUNT        ; Carrega o num. de worda que já foram escritas
+a046 601a		;	                *       TWO          ;
+a048 4000		;	                +       DUMP_INI     ; ACC = Endereço da próxima word que será escrita
+804a 0000		;	WRITE4          $       /0001        ; Escreve no arquivo de saída   0
+				;	WRITE4          $       /0001        ; Escreve no arquivo de saída
+a04c 4010		;	                +       CHECKSUM     ; Atualiza CHECKSUM
+a04e 9010		;	                MM      CHECKSUM     ; Armazena CHECKSUM atualizado
+a050 8002		;	                LD      DUMP_TAM     ;
+a052 500a		;	                -       COUNT        ;
+a054 5006		;	                -       DUMP_BL      ;
+a056 205c		;	                JN      SUM_DUMP_BL  ; if ((DUMP_TAM - COUNT - DUMP_BL) < 0) goto SUM_DUMP_BL
+a058 8006		;	                LD      DUMP_BL      ;
+a05a 005e		;	                JP      WRITE5
+a05c 4006		;	SUM_DUMP_BL     +       DUMP_BL
+805e 0000		;	WRITE5          $       /0001        ; Escreve no arquivo de saída   0
+				;	WRITE5          $       /0001        ; Escreve no arquivo de saída
+a060 900c		;	                MM      COUNT2
+a062 900e		;	                MM      COUNT3
+a064 4010		;	                +       CHECKSUM
+a066 9010		;	                MM      CHECKSUM
+a068 800c		;	LOOP2           LD      COUNT2
+a06a 108a		;	                JZ      FIM2
+a06c 800a		;	                LD      COUNT
+a06e 400e		;	                +       COUNT3
+a070 500c		;	                -       COUNT2
+a072 601a		;	                *       TWO
+a074 4012		;	                +       LOAD
+a076 4000		;	                +       DUMP_INI
+a078 907a		;	                MM      LOAD_NXT
+807a 0000		;	LOAD_NXT        $       /0001   0
+				;	LOAD_NXT        $       /0001
+807c 0000		;	WRITE           $       /0001   0
+				;	WRITE           $       /0001
+a07e 4010		;	                +       CHECKSUM
+a080 9010		;	                MM      CHECKSUM
+a082 800c		;	                LD      COUNT2
+a084 5018		;	                -       ONE
+a086 900c		;	                MM      COUNT2
+a088 0068		;	                JP      LOOP2
+a08a 8010		;	FIM2            LD      CHECKSUM
+808c 0000		;	WRITE6          $       /0001   0
+				;	WRITE6          $       /0001
+a08e 800a		;	                LD      COUNT
+a090 400e		;	                +       COUNT3
+a092 900a		;	                MM      COUNT
+a094 003a		;	                JP      LOOP
+a096 8008		;	FIM             LD      DUMP_EXE
+8098 0000		;	WRITE7          $       /0001   0
+				;	WRITE7          $       /0001
+a09a b01e		;	                RS      DUMPER

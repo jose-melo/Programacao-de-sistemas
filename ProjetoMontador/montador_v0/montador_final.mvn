@@ -1,0 +1,1438 @@
+; ===================================================================
+; ===================================================================
+;                    ESCOLA POLIT�CNICA DA USP
+; PCS - DEPARTAMENTO DE ENGENHARIA DE COMPUTA��O E SISTEMAS DIGITAIS
+;
+;  PCS-2302 - LABORAT�RIO DE FUNDAMENTOS DA ENGENHARIA DE COMPUTA��O
+;      PROFESSORES: JO�O JOS� NETO E PAULO S�RGIO MUNIZ SILVA 
+;
+;  PCS-2024 - LABORAT�RIO DE FUNDAMENTOS DA ENGENHARIA DE COMPUTA��O
+; PROFESSORES: RICARDO LUIS DE AZEVEDO DA ROCHA E JAIME SIM�O SICHMAN
+;
+; ===================================================================
+; ===================================================================
+;                 MONTADOR PARA A MVN - VERS�O 1.0 
+;          ELABORADO POR JO�O JOS� NETO - SETEMBRO DE 2005
+;         �JJN/2005 - TODOS OS DIREITOS AUTORAIS RESERVADOS
+; ===================================================================
+; ===================================================================
+;                               ROTINAS: 
+;
+;     ASSCEND  --      -- ASSOCIA ENDERE�O A UM SIMBOLO INDEFINIDO
+;     ASMB     -- 0000 -- MONTADOR - PRROGRAMA PRINCIPAL
+;     BB       --      -- CONVERTE 1 BIT EM 1 DIGITO BIN�RIO
+;     BH       --      -- CONVERTE UM NIBBLE DE 4 BITS EM UM DIGITO HEXA
+;     BINHEX   --      -- CONVERTE UMA PALAVRA DE 16 BITS EM 4 DIGITOS HEXA
+;     BINBIN   --      -- CONVERTE UMA PALAVRA DE 16 BITS EM 16 DIG BINARIOS
+;     CONV     -- 0334 -- CONVERTE OPERANDO QUALQUER PARA BIN�RIO
+;     DB       --      -- CONVERTE UM DIGITO DECIMAL PARA BIN�RIO
+;     DECBIN   --      -- CONVERTE UM N�MERO DECIMAL EM BIN�RIO DE 16 BITS
+;     ENDASSC  --      -- OBTEM ENDERE�O ASSOCIADO A UM S�MBOLO
+;     ERRO     -- 0380 -- EMITE MENSAGEM DE ERRO
+;     ESVP     --      -- ESVAZIA LISTA DE PEND�NCIAS ASSOCIADAS A UM SIMBOLO
+;     FINAL    --      -- FINALIZA O MONTADOR
+;     FONTE    --      -- GRAVA 1 LINHA FONTE NO ARQUIVO DE SAIDA
+;     GERA     --      -- GRAVA C�DIGO OBJETO NO ARQUIVO DE SA�DA
+;     HB       --      -- CONVERTE UM DIGITO HEXA PARA BIN�RIO DE 4 BITS
+;     HEXBIN   -- 03F0 -- CONVERTE N�MERO HEXADECIMAL PARA BIN�RIO
+;     INICIA   --      -- D� VALORES INICIAIS �S ESTRUTURAS DE DADOS
+;     INSERE   --      -- INSERE NOVO SIMBOLO NA TABELA DE SIMBOLOS
+;     MONTA1   -- 025E -- MONTA UMA LINHA E GERA O C�DIGO CORRESPONDENTE
+;     MTOC     -- 039A -- CONVERTE MNEMONICO EM C�DIGO DE OPERA��O
+;     OB       --      -- CONVERTE UM DIGITO OCTAL EM UM N�MERO BIN�RIO DE 3 BITS
+;     OCTBIN   --      -- CONVERTE UM N�MERO OCTAL PARA BIN�RIO DE 16 BITS
+;     PEND     --      -- INCLUI NOVA INSTR. NA LISTA DE PENDENCIAS DE SEU OPERANDO
+;     READLINE -- 020A -- L� UMA LINHA COMPLETA NO ARQUIVO FONTE
+;     SKIPBL   -- 02B6 -- POSICIONA-SE NO PRIMEIRO CARACTERE
+;                         N�O BRANCO SEGUINTE NA LINHA
+;     SKIPNB   -- 02CE -- SALTA AT� O PRIMEIRO BRANCO SEGUINTE
+;     TRADUZ1  --      -- TRADUZ PARA C�DIGO OBJETO UMA LINHA FONTE
+;     TROTULO  -- 02E6 -- TRATA O CAMPO DE R�TULO
+;     TSIMB    -- 02F0 -- TRATA R�TULO OU OPERANDO SIMB�LICO
+;     TSTSIMB  --      -- TESTA SE ENCONTROU SIMBOLO
+;     UNPACK   -- 0370 -- DESEMPACOTA ACUMULADOR EM B1 E B2
+;
+; ===================================================================
+; INDICE DE DEPENDENCIAS ENTRE AS ROTINAS DESTE MONTADOR 
+; ====================================================================
+;
+; ASMB -------------------------------------------------- 
+; . 	INICIA -------------------------------------------- 
+; .	MONTA1 --------------------------------------------
+; .	.	GERA ----------------------------------------
+; .	.	.	FONTE ---------------------------------
+; . 	. 	CONV ---------------------------------------- 
+; .	.	.	BINBIN -------------------------------- 
+; .	.	.	.	BB ------------------------------ 
+; .	.	.	.	.	TRADUZ1 ------------------- 
+; . 	. 	. 	DECBIN -------------------------------- 
+; . 	. 	. 	. 	DB ------------------------------ 
+; . 	. 	. 	. 	. 	TRADUZ1 ------------------- 
+; . 	. 	. 	HEXBIN -------------------------------- 
+; . 	. 	. 	. 	HB ------------------------------ 
+; . 	. 	. 	. 	. 	TRADUZ1 ------------------- 
+; .	.	.	OCTBIN -------------------------------- 
+; .	.	.	.	OB ------------------------------ 
+; .	.	.	.	.	TRADUZ1 ------------------- 
+; . 	. 	. 	TSIMB --------------------------------- 
+; . 	. 	. 	. 	ERRO ---------------------------- 
+; . 	. 	. 	. 	ESVP ----------------------------
+; .	.	.	.	.	BINHEX -------------------- 
+; .	.	.	.	.	.	BH ------------------
+; .	.	.	.	.	.	.	TRADUZ1 -------
+; . 	. 	. 	. 	PEND ---------------------------- 
+; .	.	.	.	.	ERRO ---------------------- 
+; . 	. 	FINAL --------------------------------------- 
+; . 	. 	MTOC ---------------------------------------- 
+; . 	. 	SKIPBL -------------------------------------- 
+; . 	. 	SKIPNB -------------------------------------- 
+; .  	. 	TROTULO ------------------------------------- 
+; . 	. 	. 	TSIMB --------------------------------- 
+; . 	. 	. 	. 	ERRO ---------------------------- 
+; . 	. 	. 	. 	ESVP ---------------------------- 
+; .	.	.	.	.	BINHEX --------------------
+; .	.	.	.	.	.	BH ------------------
+; .	.	.	.	.	.	.	TRADUZ1 -------
+; . 	. 	. 	. 	PEND ---------------------------- 
+; .	.	.	.	.	ERRO ---------------------- 
+; . 	READLINE ------------------------------------------ 
+; . 	. 	UNPACK -------------------------------------- 
+;
+; ===================================================================
+;                           MAPA DE MEM�RIA:
+;
+; 0000 - 01FF - �REA DE DADOS, CONSTANTES, TABELAS, ETC.
+; 0200 - 0209 - ASMB (PROGRAMA PRINCIPAL)
+; 020A - 025D - READLINE
+; 025E - 02B5 - MONTA1
+; 02B6 - 02CD - SKIPBL
+; 02CE - 02E5 - SKIPNB
+; 02E6 - 02EF - TROTULO
+; 02F0 - 0333 - TSIMB
+; 0334 - 036F - CONV
+; 0370 - 037F - UNPACK
+; 0380 - 0399 - ERRO
+; 039A - 03CD - MTOC
+; 03CE - 03F2 - ROTINAS AINDA N�O IMPLEMENTADAS 
+; 03F2 - 0FFF - �REA DISPON�VEL
+;
+; ===================================================================
+; ===================================================================
+;                LINGUAGEM DE MONTAGEM PARA A MVN
+; ===================================================================
+;                      PSEUDO-INSTRU��ES:
+;
+;         K  - /xxxx - CONSTANTE (HEXA, DECIMAL, OCTAL, BIN�RIO, ASCII)
+;         @  -       - ORIGEM
+;         #  -       - FIM
+;
+; ===================================================================
+;                      INSTRU��ES:
+;
+; MNEM�NICOS   C�DIGO   INSTRU��O
+;   JP   J     /0xxx    JUMP INCONDICIONAL
+;   JZ   Z     /1xxx    JUMP IF ZERO
+;   JN   N     /2xxx    JUMP IF NEGATIVE
+;   LV   V     /3xxx    LOAD VALUE
+;   +    +     /4xxx    ADD
+;   -    -     /5xxx    SUBTRACT
+;   *    *     /6xxx    MULTIPLY
+;   /    /     /7xxx    DIVIDE
+;   LD   L     /8xxx    LOAD FROM MEMORY
+;   MM   M     /9xxx    MOVE TO MEMORY
+;   SC   S     /Axxx    SUBROUTINE CALL
+;   RS   R     /Bxxx    RETURN FROM SUBROUTINE
+;   HM   H     /Cxxx    HALT MACHINE
+;   GD   G     /Dxxx    GET DATA
+;   PD   P     /Exxx    PUT DATA
+;   OS   O     /Fxxx    OPERATING SYSTEM CALL
+;
+; ===================================================================
+; ===================================================================
+; ASMB -- MONTADOR PARA A MVN - �JJN/2005
+; ===================================================================
+; 
+; 0000                      @     /0000     
+; ==================================================================
+; *** CONSTANTES E �REAS DE DADOS - �JJN/2005
+; ==================================================================
+;
+; ***  CONSTANTES NUM�RICAS E M�SCARAS  ***
+0000  00 00  ;    H0       K     /0       ; ZERO
+0002  00 01  ;    H1       K     /1       ; UM
+0004  00 02  ;    H2       K     /2       ; DOIS
+0006  00 04  ;    H4       K     /4       ; QUATRO
+0008  FF 00  ;    HFF00    K     /FF00    ; -(/80 * /80)
+000A  01 00  ;    H100     K     /0100    ; /100 = 2**8
+000C  FF FF  ;    HFFFF    K     /FFFF    ; -1
+000E  00 50  ;    MAXBYTES K     /50      ; COMPRIMENTO DA LINHA=80
+0010  00 40  ;    MAXSIMB  K     /100     ; 128 S�MBOLOS NO M�XIMO
+0012  00 00  ;    MNEM     K     /0       ; MNEM�NICO DA INSTRU��O(2 CARACT.)
+0014  FF FF  ;    OP       K     /FFFF    ; OPERANDO = -1
+0016  00 00  ;    OPCODE   K     /0       ; C�DIGO DE OPERA��O DA INSTRU��O
+0018  00 00  ;    OPERAND  K     /0       ; OPERANDO DA INSTRU��O
+001A  00 00  ;    RT       K     /0       ; R�TULO = 0
+001C  20 20  ;    SPC2     K     /2020    ; DOIS ESPA�OS
+001E  20 2C  ;    SPCPV    K     /202C    ; ESPA�O E PONTO-E-V�RGULA
+;
+; *** CONSTANTES ASCII E SIMILARES ***
+0020  27 2F  ;    APOST    K     /0027    ; AP�STROFE-BARRA
+0022  00 20  ;    BLANK    K     /0020    ; ESPA�O
+0024  00 2F  ;    BARRA    K     /002F    ; BARRA
+0026  0D 0A  ;    CRLF     K     /0D0A    ; FIM DE LINHA
+0028  00 12  ;    DIG9     K     /12      ; (NOVE ASCII=/39)-(AP�STROFE=/27)
+;
+; *** MATRIZES PARA A CONSTRU��O DE INSTRU��ES
+002A  90 00  ;    MM       MM    LINHA    ; MATRIZ P/ MONTAR "STA LINHA[X]"
+002C  80 00  ;    LD       LD    LINHA    ; MATRIZ P/ MONTAR "LDA LINHA[X]"
+;
+; ***  VARI�VEIS  ***
+002E  00 00  ;    AUX      K     /0       ; VARI�VEL AUXILIAR
+0030  00 00  ;    B1       K     /0       ; BYTE ESQUERDO
+0032  00 00  ;    B2       K     /0       ; BYTE DIREITO
+0034  00 00  ;    CHAR2    K     /0000    ; DOIS CARACTERES ASCII LIDOS
+0036  00 00  ;    IC       K     /0       ; CONTADOR DE INSTRU��ES
+0038  00 00  ;    OPERAND  K     /0       ; *** OPERANDO ***
+003A  00 00  ;    OPCODE   K     /0       ; *** C�DIGO DE OPERA��O ***
+003C  00 00  ;    PLINHA   K     /0       ; PONTEIRO PARA LINHA (CURSOR)
+003E  00 00  ;    PTS      K     /0       ; PONTEIRO PARA TAB. DE SIMB.(CURSOR)
+0040  00 00  ;    RTOP     K     /0       ; R�TULO (0) OU OPERANDO (-1)
+0042  00 00  ;    ULTIMO   K     /0       ; ULTIMO SIMBOLO NA T.S.
+;
+; *** �REAS DE DADOS ***
+0044  00 00  ;    LINHA    K    /0       ; 80 PALAVRAS PARA UMA LINHA-FONTE
+0046  00 00  ;    LINHA2   K    /0       ; AO TODO
+; 0094         ;             @    /94      ; RESERVA /50 PALAVRAS
+;
+; *** MISCELANEA *** MUDAR DE LUGAR POSTERIORMENTE ***
+0094  00 0A  ;    LF       K    /0A      ; LINE FEED
+0096  00 0D  ;    CR       K    /0D      ; CARRIAGE RETURN
+0098  00 23  ;    FIM      K    /0023    ; SUSTENIDO
+009A  00 1D  ;    ORIGEM   K    /001D    ; (ARROBA=/40) - (SUSTENIDO=/23)
+009C  44 44  ;    DUPDEF   K    /4444    ; DUPLA DEFINI��O DE S�MBOLO = "DD"
+009E  00 2F  ;    H2F      K    /002F    ; ("0" = /30) - 1
+00A0  45 52  ;    ER       K    /4552    ; "ER"
+00A2  52 4F  ;    RO       K    /524F    ; "RO"
+00A4  3A 20  ;    COLLONB  K    /3A20    ; DOIS PONTOS, BRANCO
+;
+;
+; *** TABELA DE MNEMONICOS ***
+00A6 4c 44 ;      MNEM     K    /4C44    ; 8 LD Load accumulator from memory -- MNEMONICS
+00A8 4d 4d ;               K    /4D4D    ; 9 MM Memorize from accumulator -- MNEMONICS
+00AA 53 43 ;               K    /5343    ; a SC Subroutine call -- MNEMONICS
+00AC 52 53 ;               K    /5253    ; b RS Return from subroutine -- MNEMONICS
+00AE 48 4d ;               K    /484d    ; c HM Halt MVN -- MNEMONICS
+00B0 47 44 ;               K    /4744    ; d GD Get data from device -- MNEMONICS
+00B2 50 44 ;               K    /5044    ; e PD Put data onto device -- MNEMONICS
+00B4 4f 53 ;               K    /4f53    ; f OS Operating system call -- MNEMONICS
+00B6 4a 50 ;               K    /4a50    ; 0 JP Jump unconditional -- MNEMONICS
+00B8 4a 5a ;               K    /4a5a    ; 1 JZ Zero jump -- MNEMONICS
+00BA 4a 4e ;               K    /4a4e    ; 2 JN Negative jump -- MNEMONICS
+00BC 4c 56 ;               K    /4c56    ; 3 LV Value move to accumulator -- MNEMONICS 
+00BE 2b 20 ;               K    /2b20    ; 4 +  Add -- MNEMONICS
+00C0 2d 20 ;               K    /2d20    ; 5 -  Subtract -- MNEMONICS
+00C2 2a 20 ;               K    /2a20    ; 6 *  Multiply -- MNEMONICS
+00C4 2f 20 ;               K    /2f20    ; 7 /  Divide -- MNEMONICS
+00C6 00 40 ;               K    /0040    ;   @  ORIGEM
+00C8 00 23 ;               K    /0023    ;   #  FIM
+00CA 00 4B ;               K    /004B    ;   K  CONSTANTE
+;
+00CC 00 08 ;      CODE     K    /0008    ; 8 LD Load accumulator from memory -- CODE
+00CE 00 09 ;               K    /0009    ; 9 MM Memorize from accumulator -- CODE
+00D0 00 0a ;               K    /000A    ; a SC Subroutine call -- CODE
+00D2 00 0b ;               K    /000B    ; b RS Return from subroutine -- CODE
+00D4 00 0c ;               K    /000C    ; c HM Halt MVN -- CODE
+00D6 00 0d ;               K    /000D    ; d GD Get data from device -- CODE
+00D8 00 0e ;               K    /000E    ; e PD Put data onto device -- CODE
+00DA 00 0f ;               K    /000F    ; f OS Operating system call -- CODE
+00DC 00 00 ;               K    /0000    ; 0 JP Jump unconditional  -- CODE
+00DE 00 01 ;               K    /0001    ; 1 JZ Zero jump -- CODE
+00F0 00 02 ;               K    /0002    ; 2 JN Negative jump -- CODE
+00F2 00 03 ;               K    /0003    ; 3 LV Value move to accumulator -- CODE
+00F4 00 04 ;               K    /0004    ; 4 +  Add -- CODE
+00F6 00 05 ;               K    /0005    ; 5 -  Subtract -- CODE
+00F8 00 06 ;               K    /0006    ; 6 *  Multiply -- CODE
+00FA 00 07 ;               K    /0007    ; 7 /  Divide -- CODE
+00FC 00 00 ;               K    /0000    ;   @  ORIGEM
+00FE 00 00 ;               K    /0000    ;   #  FIM
+0100 00 00 ;               K    /0000    ;   K  CONSTANTE
+;
+; *** �REA DE DADOS DE MTOC ***
+0102 00 24 ;        PMNEM   K   /24      ; 36 = ((comprimento da tabela=38) - 2)
+0104 00 A6 ;        PONTM   K   /00      ; PONTEIRO PARA TABELA DE MNEMONICOS
+0106 00 CC ;        PONTC   K   /20      ; PONTEIRO PARA TABELA DE C�DIGOS
+0108 80 00 ;        LOAD    LD  /00      ; CODIGO DE OPERA��O LOAD
+010A 90 00 ;        STORE   MM  /00      ; C�DIGO DE OPERA��O MOVE MEMORY
+010C 00 00 ;        PONT    K   /00      ; PONTEIRO DE TRABALHO
+010E 00 00 ;        CONT    K   /00      ; CONTADOR DE TRABALHO
+0110 00 44 ;        ELINHA  K   LINHA    ; ENDERE�O DE LINHA
+;
+0112 00 39 ;        H39     K   /39      ; "9" EM ASCII
+0114 00 40 ;        H40     K   /40      ; /40 = "A" - 1
+0116 00 30 ;        H30     K   /30      ; "0" EM ASCII
+; ===================================================================
+; �REAS DE DADOS DAS ROTINAS DE CONVERS�O NUM�RICA
+; ===================================================================
+;
+; *** INDICADORES DOS TIPOS DE CONVERS�O DA ROTINA CONV
+;     (SE N�O FOR NENHUM DOS CINCO, ENT�O N�O � NUM�RICO)
+;
+0118 00 2F ;         TIPOS  K   /02F      ; "/" : HEXADECIMAL
+011A 00 3D ;                K   /03D      ; "=" : DECIMAL
+011C 00 40 ;                K   /040      ; "@" : OCTAL
+011E 00 23 ;                K   /023      ; "#" : BIN�RIO
+0120 00 27 ;                K   /027      ; "'" : ASCII 
+; 
+; ====================================================================
+; *** CURSORES APONTAM OS �LTIMOS ELEMENTOS DAS TABELAS DE D�GITOS
+;     NESSAS CONSTANTES EST� A INFORMA��O DO COMPRIMENTO DAS TABELAS
+;
+0122 00 1E ;       PDHEX   K    /001E     ; /01E=(2 * (N. DE DIG. HEXA = /10) = /20)-2
+0124 00 12 ;       PDDEC   K    /0012     ; /012=(2 * (N. DE DIG. DECIMAIS= /0A)= /14)- 2 
+0126 00 0E ;       PDOCT   K    /000E     ; /00E=(2 * (N. DE DIG. OCTAIS= /08)= /10)- 2 
+0128 00 02 ;       PDBIN   K    /0002     ; /002=(2 * (N. DE DIG. BIN�RIOS= /02)= /04)- 2 
+012A 0F FF ;       PDASC   K    /0000     ; PDASC K /FFFF ; -1 (N�O EXISTE A TABELA DASC)
+; 
+; ====================================================================
+; *** CURSORES PARA OS PRIMEIROS ELEMENTOS DAS TABELAS DE D�GITOS
+;
+012C 01 50 ;       PPDHEX  K    /0150     ; ENDERE�O DE DHEX
+012E 01 5C ;       PPDDEC  K    /015C     ; ENDERE�O DE DDEC
+0130 01 60 ;       PPDOCT  K    /0160     ; ENDERE�O DE DOCT
+0132 01 6C ;       PPDBIN  K    /016C     ; ENDERE�O DE DBIN
+0134 0F FF ;       PPDASC  K    /FFFF     ; -1 (N�O EXISTE A TABELA DASC)
+; 
+; ====================================================================
+; *** CURSORES PARA OS PRIMEIROS ELEMENTOS DAS TABELAS DE VALORES CONVERTIDOS
+;
+0136 01 70 ;       PPBHEX  K    /0170     ; ENDERE�O DE BHEX
+0138 01 7C ;       PPBDEC  K    /017C     ; ENDERE�O DE BDEC
+013A 01 80 ;       PPBOCT  K    /0180     ; ENDERE�O DE BOCT
+013C 01 8C ;       PPBBIN  K    /018C     ; ENDERE�O DE BBIN
+013E FF FF ;       PPBASC  K    /FFFF     ; -1 (N�O EXISTE A TABELA DASC)
+; 
+; ====================================================================
+;
+; 
+; ====================================================================
+; *** TABELAS DE DIGITOS HEXA, DECIMAIS, OCTAIS, BIN�RIOS ***
+;
+;                          @    /150
+0150 00 46 ;        DHEX   K    /46       ; "F"
+0152 00 45 ;               K    /45       ; "E"
+0154 00 44 ;               K    /44       ; "D"
+0156 00 43 ;               K    /43       ; "C"
+0158 00 42 ;               K    /42       ; "B"
+015A 00 41 ;               K    /41       ; "A"
+015C 00 39 ;        DDEC   K    /39       ; "9"
+015E 00 38 ;               K    /38       ; "8"
+0160 00 37 ;        DOCT   K    /37       ; "7"
+0162 00 36 ;               K    /36       ; "6"
+0164 00 35 ;               K    /35       ; "5"
+0166 00 34 ;               K    /34       ; "4"
+0168 00 33 ;               K    /33       ; "3"
+016A 00 32 ;               K    /32       ; "2"
+016C 00 31 ;        DBIN   K    /31       ; "1"
+016E 00 30 ;               K    /30       ; "0"
+;
+; 
+; ====================================================================
+; *** TABELAS DE N�MEROS BIN�RIOS CORRESPONDENTES ***
+;
+0170 00 0F ;        BHEX   K    /000F     ; "F"
+0172 00 0E ;               K    /000E     ; "E"
+0174 00 0D ;               K    /000D     ; "D"
+0176 00 0C ;               K    /000C     ; "C"
+0178 00 0B ;               K    /000B     ; "B"
+017A 00 0A ;               K    /000A     ; "A"
+017C 00 09 ;        BDEC   K    /0009     ; "9"
+017E 00 08 ;               K    /0008     ; "8"
+0180 00 07 ;        BOCT   K    /0007     ; "7"
+0182 00 06 ;               K    /0006     ; "6"
+0184 00 05 ;               K    /0005     ; "5"
+0186 00 04 ;               K    /0004     ; "4"
+0188 00 03 ;               K    /0003     ; "3"
+018A 00 02 ;               K    /0002     ; "2"
+018C 00 01 ;        BBIN   K    /0001     ; "1"
+018E 00 00 ;               K    /0000     ; "0"
+;
+0190 00 00 ;        DADO   K    /0000     ; PAR�METRO DE ENTRADA DAS ROTINAS DE CONVERS�O
+0192 00 00 ;        PTX    K    /0000     ; PAR�METRO DE ENTRADA DAS ROTINAS DE CONVERS�O
+0194 00 00 ;        CTX    K    /0000     ; PAR�METRO DE ENTRADA DAS ROTINAS DE CONVERS�O
+0196 00 00 ;        PTY    K    /0000     ; PAR�METRO DE ENTRADA DAS ROTINAS DE CONVERS�O
+0198 00 10 ;        H10    K    /0010     ; BASE HEXADECIMAL
+019A 00 0A ;        H0A    K    /000A     ; BASE DECIMAL
+019C 00 08 ;        H8     K    /0008     ; BASE OCTAL
+019E 00 00 ;        RESUL  K    /0000     ; RESULTADO DA CONVERS�O
+;
+; ===================================================================
+; ===================================================================
+; MONTADOR -- PROGRAMA PRINCIPAL - �JJN/2005
+;
+; 0200                      @     /0200
+0200  80 00 ;     ASMB     LD    H0        ; POSICIONA ENDERE�O EM ZERO
+0202  90 36 ;              MM    IC        ; PARA GERAR C�DIGO
+0204  A2 0A ;     LOOP     SC    READLINE  ; L� PR�XIMA LINHA
+0206  A2 5E ;              SC    MONTA1    ; MONTA A LINHA LIDA E GERA C�DIGO
+0208  02 04 ;              JP    LOOP      ; LOOP INFINITO (P�RA AO ACHAR FINAL)
+;
+; ===================================================================
+; READLINE -- L� UMA LINHA DE C�DIGO-FONTE NO DISCO - �JJN/2005
+;
+020A  00 00 ;     READLINE JP   /00      ; PONTO DE ENTRADA DE READLINE
+020C  81 10 ;              LD   ELINHA   ; INICIA PONTEIRO PARA LINHA
+020E  90 2E ;              MM   AUX      ; A SER LIDA COM ZERO
+;
+0210  40 2A ;     READLOOP +    MM       ; MONTA "STA LINHA[AUX]"
+0212  92 30 ;              MM   GUARDA1  ;
+0214  40 04 ;              +    H2       ; MONTA "STA LINHA[AUX+2]"
+0216  92 32 ;              MM   GUARDA2  ;
+0218  D3 00 ;              GD   /3       ; L� PR�XIMOS DOIS CARACTERES
+021A  90 34 ;              MM   CHAR2    ; GUARDA TEMPORARIAMENTE
+021C  A3 70 ;              SC   UNPACK   ; DESEMPACOTA COMO B1 E B2
+021E  80 30 ;              LD   B1       ; GUARDA BYTE ESQUERDO 
+;
+0220  02 30 ;      **************************************** TIRAR DEPOIS
+;
+0230  90 44 ;     GUARDA1  MM   LINHA    ; EM LINHA[AUX]
+0232  80 32 ;              LD   B2       ; GUARDA BYTE DIREITO
+0234  90 46 ;     GUARDA2  MM   LINHA2   ; EM LINHA[AUX+2]
+0236  80 2E ;              LD   AUX      ; .
+0238  40 06 ;              +    H4       ; AUX:=AUX+4
+023A  90 2E ;              MM   AUX      ; .
+023C  80 34 ;              LD   CHAR2    ;
+023E  50 26 ;              -    CRLF     ; TESTA FIM DE LINHA (PAR)
+0240  12 5C ;              JZ   READFIM  ; SIM: VAI RETORNAR
+;
+0242  80 30 ;     TEST     LD   B1       ; N�O:
+0244  50 94 ;              -    LF       ; TESTA FIM DE LINHA (IMPAR)
+0246  12 5C ;              JZ   READFIM  ; SIM: VAI RETORNAR
+0248  80 0E ;              LD   MAXBYTES ; N�O: VERIFICA SE H� ESTOURO
+024A  50 2E ;              -    AUX      ; DO N�MERO DE BYTES NA LINHA
+024C  22 50 ;              JN   FLINHA   ; SIM: VAI IGNORAR RSTO DA LINHA
+024E  12 10 ;              JP   READLOOP ; N�O: VAI LER MAIS BYTES
+;
+0250  D3 00 ;     FLINHA   GD   /3       ; L� PR�XIMOS DOIS CARACTERES
+0252  90 34 ;              MM   CHAR2    ; GUARDA TEMPORARIAMENTE
+0254  50 26 ;              -    CRLF     ; SE FOR FIM DE LINHA (PAR),
+0256  12 5C ;              JZ   READFIM  ; VAI RETORNAR
+0258  A3 70 ;              SC   UNPACK   ; SE N�O, DESEMPACOTA COMO B1 E B2
+025A  12 42 ;              JP   TEST     ; VAI TESTAR FIM DE LINHA (IMPAR)
+;
+025C  B2 0A ;     READFIM  RS   READLINE ; RETORNA
+;
+; ==================================================================
+; *** MONTA1 -- MONTA UMA LINHA DE C�DIGO FONTE - �JJN/2005
+;
+025E  00 00 ;     MONTA1  JP    /00     ; PONTO DE ENTRADA DE MONTA1
+0260  80 00 ;             LD    H0      ; APONTA INICIO
+0262  90 3C ;             MM    PLINHA  ; DA LINHA
+0264  80 44 ;             LD    LINHA   ; PRIMEIRA POSI��O=R�TULO
+0266  50 22 ;             -     BLANK   ; VERIFICA SE EXISTE R�TULO
+0268  12 6C ;             JZ    OP1     ; N�O TEM: VAI PROCURAR OPERANDO
+026A  A2 E6 ;             SC    TROTULO ; TRATA CAMPO DE R�TULO
+026C  A2 B6 ;     OP1     SC    SKIPBL  ; PULA BRANCOS
+026E  80 3C ;             LD    PLINHA  ; OBT�M POSI��O DO MNEM�NICO
+0270  40 2C ;             +     LD      ; MONTA INSTRU��O "LDA LINHA[PLINHA]"
+0272  92 80 ;             MM    MN1     ; PARA USAR ADIANTE
+0274  40 04 ;             +     H2      ; MONTA INSTRU��O "ADA LINHA+N+2"
+0276  92 84 ;             MM    MN2     ; GUARDA PARA EXECUTAR ADIANTE
+0278  A2 CE ;             SC    SKIPNB  ; PULA MNEM�NICO
+027A  A2 B6 ;             SC    SKIPBL  ; LOCALIZA OPERANDO
+027C  A3 34 ;             SC    CONV    ; CONVERTE OPERANDO DE QUALQUER TIPO
+027E  90 38 ;             MM    OPERAND ; GUARDA PARA MONTAR C�DIGO
+0280  80 00 ;     MN1     LD    /0      ; LD  PRIMEIRO CARACTERE DO MNEMONICO
+0282  60 0A ;             *     H100    ; SHIFT � ESQUERDA DE 8 BITS
+0284  40 00 ;     MN2     +     /0      ; COMP�E SEGUNDO CARACTERE DO MNEMONICO
+0286  90 12 ;             MM    MNEM    ; PREPARA-SE PARA CONVERTER MNEM�NICO
+0288  A3 9A ;             SC    MTOC    ; OBT�M OPCODE CORRESPONDENTE
+028A  90 3A ;             MM    OPCODE  ; GUARDA PARA MONTAR
+028C  80 12 ;             LD    MNEM    ;
+028E  50 98 ;             -     FIM     ; TESTA SE � A PSEUDO "FIM" (SUSTENIDO)
+0290  12 AC ;             JZ    ORG     ; SIM: VAI TRATAR
+0292  50 9A ;             -     ORIGEM  ; TESTA SE � A PSEUDO "ORIGEM" (ARROBA)
+0294  12 B2 ;             JZ    END     ; SIM: VAI TRATAR
+;
+; *** TRATAMENTO DA PSEUDO INSTRU��O "CONSTANTE" 
+; *** E DAS INSTRU��ES NORMAIS DE M�QUINA
+; *** E SUA GERA��O DE C�DIGO CARREG�VEL EM DISCO
+;
+0000  00 00 ;             SC    GERA    ; GERA A LINHA DE C�DIGO OBJETO
+0000  00 00 ;             RS    MONTA1
+;
+; *** TRATAMENTO DA PSEUDO INSTRU��O "ORIGEM"
+02AC  80 38 ;     ORG     LD    OPERAND ; NOVA ORIGEM
+02AE  90 36 ;             MM    IC      ; IC:=NOVA ORIGEM
+02B0  B2 5E ;             RS    MONTA1  ; RETORNA
+;
+; *** TRATAMENTO DA PSEUDO INSTRU��O "FIM"
+02B2  A3 DE ;     END     SC    FINAL   ; FIINALIZA O MONTADOR
+02B4  C2 00 ;             HM    ASMB    ; P�RA O PROCESSAMENTO
+;
+; ==================================================================
+; SKIPBL -- SALTA ESPA�OS E POSICIONA-SE NO PRIMEIRO - �JJN/2005
+;           CARACTERE N�O BRANCO SEGUINTE NA LINHA
+;
+02B6  00 00 ;     SKIPBL  JP    /00     ; ENTRADA DE SKIPBL
+02B8  80 3C ;             LD    PLINHA  ; MONTA 
+;
+02BA  40 2C ;     LOOP3   +     LD      ; INSTRU��O
+02BC  92 BE ;             MM    L3      ; PARA EXECUTAR
+02BE  80 44 ;     L3      LD    LINHA   ; LD  LINHA[PLINHA]
+02C0  50 22 ;             -     BLANK   ; SE FOR BRANCO,
+02C2  12 C6 ;             JZ    OUTRO   ; VAI LER MAIS UM
+02C4  B2 B6 ;             RS    SKIPBL  ; SE N�O, RETORNA
+;
+02C6  80 3C ;     OUTRO   LD    PLINHA  ; INCREMENTA
+02C8  40 04 ;             +     H2      ; PONTEIRO
+02CA  90 3C ;             MM    PLINHA  ; PARA LINHA
+02CC  02 BA ;             JP    LOOP3   ; VOLTA A TESTAR
+;
+; ==================================================================
+; SKIPNB -- POSICIONA-SE NO PRIMEIRO ESPA�O - �JJN/2005
+;           SEGUINTE NA LINHA
+;
+02CE  00 00 ;     SKIPNB  JP    /00     ; ENTRADA DE SKIPNB
+02D0  80 3C ;             LD    PLINHA  ; MONTA 
+;
+02D2  40 2C ;     LOOP4   +     LD      ; INSTRU��O
+02D4  92 D6 ;             MM    L4      ; PARA EXECUTAR
+02D6  80 44 ;     L4      LD    LINHA   ; LD  LINHA[PLINHA]
+02D8  50 22 ;             -     BLANK   ; SE N�O FOR BRANCO,
+02DA  12 E4 ;             JZ    RETORNA ; VAI LER MAIS UM
+02DC  80 3C ;             LD    PLINHA  ; INCREMENTA
+02DE  40 04 ;             +     H2      ; PONTEIRO
+02E0  90 3C ;             MM    PLINHA  ; PARA LINHA
+02E2  02 D2 ;             JP    LOOP4   ; VOLTA A TESTAR         
+;
+02E4  B2 CE ;     RETORNA RS    SKIPNB  ; SE FOR, RETORNA
+;
+; ==================================================================
+; TROTULO - TRATA O CAMPO DE R�TULO - �JJN/2005
+;
+02E6  00 00 ;     TROTULO JP    /00     ; ENTRADA DE TROTULO
+02E8  80 1A ;             LD    RT      ; INDICA QUE SE TRATA DE
+02EA  90 40 ;             MM    RTOP    ; R�TULO E N�O OPERANDO
+02EC  A2 F0 ;             SC    TSIMB   ; TRATA SIMBOLO ENCONTRADO
+02EE  B2 E6 ;             RS    TROTULO ; RETORNA
+;
+; ==================================================================
+; 02F0 A 0233 - �REA DA ANTIGA VERS�O DE TSIMB - LIVRE
+;
+; ==================================================================
+; CONV -- CONVERTE OPERANDO QUALQUER PARA BIN�RIO - �JJN/2005
+;         RETORNA COM VALOR CONVERTIDO EM OPERAND
+;
+0334  00 00 ;     CONV    JP    /00      ; ENTRADA DE CONV
+0336  80 3C ;             LD    PLINHA   ; MONTA INSTRU��O
+0338  40 2C ;             +     LD       ; "LDA LINHA[PLINHA]"
+033A  93 3C ;             MM    PROXIMO  ; GUARDA PARA EXECUTAR:
+033C  80 3C ;     PROXIMO LD    LINHA    ; LD  LINHA[PLINHA]
+033E  50 24 ;             -     BARRA    ; VERIFICA SE OPERANDO � HEXA
+0340  13 52 ;             JZ    HEXA     ;
+0342  50 20 ;             -     APOST    ; VERIFICA SE � OPERANDO ASCII
+0344  13 66 ;             JZ    ASCII    ;
+0346  50 28 ;             -     DIG9     ; VERIFICA SE � NUM�RICO
+0348  23 5E ;             JN    SYMB     ; DEFAULT: SIMB�LICO
+034A  40 9E ;             +     H2F      ; /2F= "0"-1
+034C  23 5E ;             JN    SYMB     ; N�O � D�GITO DECIMAL: SYMB
+;
+;                                      ;;; TRATAMENTO DE OPERANDO DECIMAL:
+034E  A3 D2 ;             SC    DECBIN   ; � NUM�RICO: CONVERTE P/ BIN�RIO
+0350  03 5A ;             JP    GUARDA   ; VAI GUARDAR RESULTADO E RETORNAR
+;
+0352  80 3C ;     HEXA    LD    PLINHA ;;; TRATAMENTO DE OPERANDO HEXA:  
+0354  40 04 ;             +     H2       ; APONTA PRIMEIRO D�GITO �TIL
+0356  90 3C ;             MM    PLINHA   ; DO NUMERO HEXADECIMAL
+0358  A3 F2 ;             SC    HEXBIN   ; CONVERTE PARA BIN�RIO
+;
+;                                      ;;; AP�S A CONVERS�O REALIZADA,
+035A  90 38 ;     GUARDA  MM    OPERAND  ; GUARDA O RESULTADO E
+035C  B3 34 ;             RS    CONV     ; RETORNA
+;
+;                                      ;;; TRATAMENTO DE OPERANDO SIMB�LICO:
+035E  80 14 ;     SYMB    LD    OP       ; INDICA QUE � CAMPO DE OPERANDO
+0360  90 40 ;             MM    RTOP     ; PARA A ROTINA TSIMB
+0362  A2 F0 ;             SC    TSIMB    ; TRATA OPERANDO SIMB�LICO
+0364  03 5A ;             JP    GUARDA   ; VAI GUARDAR RESULTADO E RETORNAR
+;
+;                                      ;;; TRATAMENTO DE OPERANDO ASCII:
+0366  83 3C ;     ASCII   LD    PROXIMO  ; COLOCA "LDA LINHA[PLINHA]"
+0368  40 04 ;             +     H2       ; CONSTR�I "LDA LINHA[PLINHA+2]"
+036A  93 6C ;             MM    PROX1    ; GUARDA PARA EXECUTAR:
+036C  80 3C ;     PROX1   LD    LINHA    ; LD  LINHA+PLINHA+2
+036E  03 5A ;             JP    GUARDA   ; VAI GUARDAR ASCII E RETORNAR
+;
+; ==================================================================
+; UNPACK -- DESEMPACOTA ACUMULADOR = /XYZT COMO - �JJN/2005
+;           B1 = /00XY    E     B2 = /00ZT
+;
+0370  00 00 ;     UNPACK  JP    /00      ; ENTRADA DE UNPACK
+0372  90 2E ;             MM    AUX      ; SALVA O ACUMULADOR
+;
+; ACUMULADOR = /XY * /100 + /ZT
+; DESCOMPACTA-OS EM DOIS BYTES (B1 E B2)
+;
+; B1 = /XY = (ACUMULADOR DIV /100)
+; B2 = /XYZT - (/100 * /XY)
+;
+0374  70 0A ;             /     H100     ; SEPARA PRIMEIRO CARACTERE
+0376  90 30 ;             MM    B1       ; GUARDA EM B1
+0378  60 08 ;             *     HFF00    ; CALCULA -(/100 * B1)
+037A  40 2E ;             +     AUX      ; SEPARA SEGUNDO CARACTERE
+037C  90 32 ;             MM    B2       ; GUARDA EM B2
+037E  B3 70 ;             RS    UNPACK   ; RETORNA
+;
+; ==================================================================
+; ERRO -- IMPRIME MENSAGEM DE ERRO - �JJN/2005
+;         COM O C�DIGO ASCII DE DUAS LETRAS PASSADO NO ACUMULADOR
+;
+; C�DIGOS DE ERRO:
+; DD - DUPLA DEFINI��O DE R�TULO
+;
+0380  00 00 ;     ERRO    JP    /00      ; ENTRADA DE ERRO
+0382  90 2E ;             MM    AUX      ; SALVA CODIGO DO ERRO
+0384  80 A0 ;             LD    ER       ; IMPRIME
+0386  E0 03 ;             PD    /3       ; "ER"
+0388  80 A2 ;             LD    RO       ; IMPRIME
+038A  E0 03 ;             PD    /3       ; "RO"
+038C  80 A4 ;             LD    COLLONB  ; IMPRIME
+038E  E0 03 ;             PD    /3       ; ": "
+0390  80 2E ;             LD    AUX      ; IMPRIME
+0392  E0 03 ;             PD    /3       ; C�DIGO DO ERRO
+0394  80 26 ;             LD    CRLF     ; IMPRIME
+0396  E0 03 ;             PD    /3       ; FIM DE LINHA
+0398  B3 80 ;             RS    ERRO     ; RETORNA
+;
+; ===================================================================
+; ===================================================================
+; ****** MTOC - CONVERTE MNEMONICO PARA C�DIGO DE OPERA��O - �JJN/2005
+; RECEBE PMNEM - INFORMA O COMPRIMENTO DA TABELA DE MNEMONICOS
+;        PONTM - ENDERE�O DO INICIO DA TABELA DE MNEMONICOS
+;        PONTC - ENDERE�O DO INICIO DA TABELA DE C�DIGOS
+;=======================================================================  RECODIFICADA OK
+;
+039A  00 00 ;      MTOC    JP    /0000    ; PONTO DE ENTRADA DE MTOC
+039C  81 02 ;              LD    PMNEM    ; AC := COMPRIMENTO DA TABELA - 2
+039E  90 2E ;              MM    AUX      ; GUARDA EM UM CURSOR DE TRABALHO
+03A0  81 04 ;              LD    PONTM    ; MONTA 
+03A2  41 0E ;              +     CONT     ; INSTRU��O
+03A4  41 08 ;              +     LOAD     ; LD MNEM[CONT]
+03A6  93 A8 ;              MM    L2       ; Modifica a proxima instrucao
+03A8  80 00 ;      L2      LD    /00      ; LOOP2:   AC := MEM[M + cont]
+03B0  50 A6 ;              -     MNEM     ; AC := AC - MNEM
+03B2  13 BE ;              JZ    ENCON2   ; IF AC = 0, goto ENCONTROU2
+03B4  81 0E ;              LD    CONT     ; AC := CONT
+03B6  50 04 ;              -     H2       ; AC := AC - 2
+03B8  91 0E ;              MM    CONT     ; CONT := AC
+03BA  23 CC ;              JN    ERR2     ; IF AC < 0, goto ERRO2
+03BC  03 A8 ;              JP    L2       ; goto LOOP2
+03BE  81 06 ;      ENCON2  LD    PONTC    ; ENCONTROU2: AC := PONTC
+03C0  41 0E ;              +     CONT     ; AC := AC + CONT
+03C2  41 08 ;              +     LOAD     ; AC := AC + CONT + #LOAD
+03C4  93 C6 ;              MM    L3       ; Modifica a proxima instrucao
+03C6  80 00 ;      L3      LD    /00      ; "LD CODE[CONT]"
+03C8  90 16 ;              MM    OPCODE   ; OPCODE := AC
+03CA  B3 9A ;              RS    MTOC     ; RETORNA
+03CC  C3 9A ;      ERR2    HM    ERR2     ; ERRO: MNEMONICO INV�LIDO ************ MUDAR
+;
+; ===================================================================
+; ****** TRADUZ1 - CONVERTE CONFORME TABELAS DE CONVERS�O (TX PARA TY)- �JJN/2005
+;
+; RECEBE DADO  - DADO A SER CONVERTIDO (1 PALAVRA) 
+;        CTX - INFORMA O COMPRIMENTO DA TABELA (TX OU TY)
+;        PTX - ENDERE�O DO INICIO DA TABELA TX
+;        PTY - ENDERE�O DO INICIO DA TABELA DE C�DIGOS
+;
+; PRODUZ RESUL - RESULTADO DA CONVERS�O (1 PALAVRA)EM RESUL E NO ACUMULADOR
+;                N�O ENCONTRANDO, RETORNA -1 
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO EXTRAIDO DE HB):
+;        LD DIGHEXA ; D�GITO ASCII A CONVERTER
+;        MM DADO    ; SALVA EM DADO O DIGITO A CONVERTER
+;        LD PPDHEX  ; ENDERE�O DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+;        MM PTX
+;        LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+;        MM CTX
+;        LD PPBHEX  ; ENDERE�O DE BHEX (TABELA BIN�RIA DE D�GITOS HEXA)
+;        MM PTY
+;        SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+;                   ; O RESULTADO J� FICA NO ACUMULADOR)
+;
+;                                                                          OK CODIFICADO
+03F2  00 00 ;      TRADUZ1 JP    /0000    ; PONTO DE ENTRADA DE MTOC
+03F4  80 50 ;              LD    CTX      ; AC := COMPRIMENTO DA TABELA TX - 2
+03F6  90 4E ;              MM    AUX      ; GUARDA EM UM CURSOR DE TRABALHO
+03F8  80 40 ;              LD    PTX      ; MONTA 
+03FA  40 4E ;              +     CONT     ; INSTRU��O
+03FC  40 44 ;              +     LOAD     ; LD TX[CONT]
+03FE  94 18 ;              MM    LT2      ; Modifica a proxima instrucao
+0400  80 00 ;      LT1     LD    /00      ; LOOP:   AC := TX[CONT]
+0402  50 4C ;              -     DADO     ; AC := AC - DADO
+0404  14 10 ;              JZ    ENCON2   ; IF AC = 0, goto ENCONTROU2
+0406  80 4E ;              LD    CONT     ; AC := CONT
+0408  50 04 ;              SUB   H2       ; AC := AC - 2
+040A  90 4E ;              MM    CONT     ; CONT := AC
+040C  24 1E ;              JN    ERR2     ; IF AC < 0, goto ERRO2
+040E  04 00 ;              JP    LT1      ; goto LOOP
+0410  80 42 ;      ENCON2  LD    PTY      ; ENCONTROU2: AC := PTY
+0412  40 4E ;              +     CONT     ; AC := AC + CONT
+0414  40 44 ;              +     LOAD     ; AC := AC + CONT + #LOAD
+0416  94 18 ;              MM    LT2      ; Modifica a proxima instrucao
+0418  80 00 ;      LT2     LD    /00      ; "LD TY[CONT]" RESULTADO DA CONVERS�O
+041A  90 4A ;      LT3     MM    RESUL    ; RESUL := AC
+041C  B3 F2 ;              RS    TRADUZ1  ; RETORNA
+041E  C2 5C ;      ERR2    LD    HFFFF    ; DADO INV�LIDO 
+0420  04 1A ;              JP    LT3      ; VAI RETORNAR -1 
+;
+; ====================================================================
+;
+; *** HB - CONVERTE UM DIGITO HEXADECIMAL PARA BIN�RIO - �JJN/2005
+;
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO):
+;
+;           LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO HEXA
+;           SC HB     ; HB CONVERTE-O PARA BIN�RIO, E
+;           MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+;                     ; MAS TAMB�M EST� DISPON�VEL EM RESUL
+;
+;                                                                          OK CODIFICADO
+0422  00 00 ;      HB      JP /00     ; ENTRADA DE HB
+0424  91 90 ;              MM DADO    ; SALVA EM DADO A INFORMA��O RECEBIDA NO ACUMULADOR
+0426  81 2C ;              LD PPDHEX  ; ENDERE�O DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+0428  91 92 ;              MM PTX
+042A  81 22 ;              LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+042C  91 94 ;              MM CTX
+042E  81 36 ;              LD PPBHEX  ; ENDERE�O DE BHEX (TABELA BIN�RIA DE D�GITOS HEXA)
+0430  91 96 ;              MM PTY
+0432  A3 F2 ;              SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+0434  B4 22 ;              RS HB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+;
+; ====================================================================
+; ====================================================================
+;  *** HEXBIN - ROTINA DE CONVERS�O HEXADECIMAL PARA BIN�RIO ***  �JJN/2005 verificar
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;                                                                          OK CODIFICADO
+0436  00 00 ;     HEXBIN  JP    /00        ; ENTRADA DE HEXBIN
+0438  80 00 ;             LD    H0         ; INICIA OPERAND
+043A  90 38 ;             MM    OPERAND    ; COM ZERO
+043C  80 3C ;             LD    PLINHA     ; MONTA INSTRU��O
+043E  41 08 ;             +     LD         ; "LD LINHA[PLINHA]"
+0440  94 42 ;     L6      MM    PR         ; GUARDA PARA EXECUTAR ADIANTE
+0442  80 00 ;     PR      LD    LINHA      ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+0444  A4 22 ;             SC    HB         ; CONVERTE PARA BIN�RIO
+0446  24 56 ;             JN    FORA       ; N�O ERA D�GITO HEXA: ACABOU
+0448  80 38 ;             LD    OPERAND    ; OBTEM RESULTADO DA CONVERS�O (AC, RESUL)
+044A  61 98 ;             *     H10        ; ERA: MULTIPLICA OPERAND POR (/10 = 16)
+044C  41 9E ;             +     RESUL      ; SOMA O D�GITO CONVERTIDO
+044E  90 38 ;             MM    OPERAND    ; ATUALIZA OPERAND
+0450  84 42 ;             LD    PR         ; MODIFICA NOVAMENTE A INSTRU��O
+0452  40 04 ;             +     H2         ; APONTANDO O PR�XIMO CARACTERE
+0454  04 40 ;             JP    L6         ; VAI TRATAR OUTRO DIGITO
+0456  B4 36 ;     FORA    RS    HEXBIN     ; N�O � D�GITO: RETORNA
+;
+; ====================================================================
+; *** DB - CONVERTE UM DIGITO DECIMAL PARA BIN�RIO - �JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO DECIMAL
+;                        SC DB     ; DB CONVERTE-O PARA BIN�RIO, E
+;                        MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+;                                  ; MAS TAMB�M EST� DISPON�VEL EM RESUL
+;                                                                          OK CODIFICADO
+0458  00 00 ;      DB    JP /00     ; ENTRADA DE DB
+045A  91 90 ;            MM DADO    ; SALVA EM DADO A INFORMA��O RECEBIDA NO ACUMULADOR
+045C  81 2E ;            LD PPDDEC  ; ENDERE�O DE DDEC (TABELA ASCII DE DIG. DECIMAIS)
+045E  91 92 ;            MM PTX
+0460  81 24 ;            LD PDDEC   ; COMPRIMENTO DA TABELA DDEC 
+0462  91 94 ;            MM CTX
+0464  81 38 ;            LD PPBDEC  ; ENDERE�O DE BDEC (TABELA BIN�RIA DE D�G. DECIMAIS)
+0466  91 96 ;            MM PTY
+0468  A3 F2 ;            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+046A  B4 58 ;            RS DB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+;
+; ====================================================================
+;  *** DECBIN - ROTINA DE CONVERS�O DECIMAL PARA BIN�RIO *** verificar - �JJN/2005
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;                                                                          OK CODIFICADO
+046C  00 00 ;     DECBIN  JP    /00        ; ENTRADA DE DECBIN
+046E  80 00 ;             LD    H0         ; INICIA OPERAND
+0470  90 38 ;             MM    OPERAND    ; COM ZERO
+0472  80 3C ;             LD    PLINHA     ; MONTA INSTRU��O
+0474  41 08 ;             +     LD         ; "LD LINHA[PLINHA]"
+0476  94 78 ;     D6      MM    PR         ; GUARDA PARA EXECUTAR ADIANTE
+0478  80 00 ;     PR      LD    LINHA      ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+047A  A4 58 ;             SC    DB         ; CONVERTE PARA BIN�RIO
+047C  24 8C ;             JN    FORA       ; N�O ERA D�GITO HEXA: ACABOU
+047E  90 38 ;             LD    OPERAND    ; OBTEM RESULTADO DA CONVERS�O (AC, RESUL)
+0480  61 9A ;             *     H0A        ; ERA: MULTIPLICA OPERAND POR (/0A = 10)
+0482  41 9E ;             +     RESUL      ; SOMA O D�GITO CONVERTIDO
+0484  90 38 ;             MM    OPERAND    ; ATUALIZA OPERAND
+0486  84 78 ;             LD    PR         ; MODIFICA NOVAMENTE A INSTRU��O
+0488  40 04 ;             +     H2         ; APONTANDO O PR�XIMO CARACTERE
+048A  04 76 ;             JP    D6         ; VAI TRATAR OUTRO DIGITO
+048C  B4 6C ;     FORA    RS    DECBIN     ; N�O � D�GITO: RETORNA
+;
+; ==================================================================
+; TSIMB - TRATA R�TULO OU OPERANDO SIMB�LICO - �JJN/2005
+;
+;                                                                   RECODIFICAR
+02F0  00 00 ;     TSIMB   JP    /00        ; ENTRADA DE TSIMB
+02F2  80 00 ;             LD    H0         ; FAZ OPERAND:=0
+02F4  90 38 ;             MM    OPERAND    ; (ZERA CAMPO DE OPERANDO)
+02F6  80 42 ;             LD    ULTIMO     ; APONTA FIM DA TAB.SIMB
+;
+02F8  90 3E ;     LOOPTS  MM    PTS        ; ATUALIZA CURSOR P/ T.S.
+02FA  13 12 ;             JZ    ACAB       ; SE 0, FIM DA BUSCA NA T.S.
+;
+048E  00 00 ;             *     H2         ; /02= N. DE PALAVRAS/SIMBOLO
+0490  40 00 ;             +     SBTS       ; MONTA "- TS1[PTS]"
+0492  00 00 ;             MM    SUBTS1     ; GUARDA PRA COMPARAR PRIMEIRA PALAVRA
+0494  94 78 ;             +     H2         ; MONTA "- TS[PTS+2]"
+0496  00 00 ;             MM    SUBTS2     ; GUARDA PRA COMPARAR SEGUNDA PALAVRA
+;
+0498  80 3C ;             LD    PLINHA     ; MONTA INSTRU��O
+04A0  41 08 ;             +     LD         ; "LD LINHA[PLINHA]"
+04A2  94 78 ;             MM    PR1        ; GUARDA PARA EXECUTAR ADIANTE
+04A4  94 78 ;             +     H2         ; MONTA "LD LINHA[PLINHA+2]"
+04A6  94 78 ;             MM    PR2        ; GUARDA PARA EXECUTAR ADIANTE
+;
+04A8  80 00 ;     PR1     LD    /00        ; LD LINHA[PLINHA] (TRAZ EM ASCII)
+04AA  00 00 ;     SUBTS1  -     /00        ; - TS1[PTS]
+04AC  80 00 ;             JZ    PR2        ; SE IGUAL: VAI TESTAR SEGUNDA PALAVRA
+04A6  94 78 ;             JP    PRXSIMB    ; SE DIFERENTE: N�O ACHOU AINDA
+;
+04A8  80 00 ;     PR2     LD    /00        ; LD LINHA[PLINHA] (TRAZ EM ASCII)
+04AA  00 00 ;     SUBTS2  -     /00        ; - TS1[PTS]
+04AC  80 00 ;             JZ    ACHOU      ; SE IGUAL: ACHOU O SIMBOLO
+;
+; N�O ENCONTROU AINDA: PROCURA NO PROXIMO SIMBOLO DA TABELA
+;
+032E  80 3E ;     PRXSIMB LD    PTS        ; PTS � CURSOR P/ TAB. SIMB.
+0330  40 04 ;             -     H2         ; DECREMENTA PTS
+0332  02 F8 ;             JP    LOOPTS     ; VAI TESTAR PROXIMO ELEMENTO
+;
+;
+; NAO ENCONTROU NA TABELA TODA: INSERE O NOVO SIMBOLO NA TABELA
+;
+0312  80 42 ;     ACAB    LD    ULTIMO     ; FIM DA T.S.:(S�MBOLO N�O ENCONTRADO)
+0314  40 04 ;             +     H2         ; INCREMENTA O NUMERO DE SIMBOLOS 
+0316  90 42 ;             MM    ULTIMO     ; DA TABELA DE SIMBOLOS
+0000  00 00 ;             -     MAXSIMB    ; TESTA SE ESTOUROU A TABELA
+0000  00 00 ;             JN    INSERE     ; N�O: => VAI INSERIR
+0000  00 00 ;             LD    ETS        ; CARREGA C�D.DE ESTOURO DE TABELA
+0000  00 00 ;             SC    ERRO       ; GERA MENSAGEM DE ERRO
+0000  00 00 ;             RS    TSIMB      ; RETORNA
+;
+; INSER��O DE UM NOVO SIMBOLO NA TABELA:
+;
+; TS[ULTIMO]:=LINHA[PLINHA]; TS[ULTIMO+1]:=LINHA[PLINHA+1]
+;
+0000  00 00 ;     INSERE  LD    PLINHA     ; INSERE 
+0000  00 00 ;             +     LD         ;
+0000  00 00 ;             MM    IN1        ;
+0000  00 00 ;             +     H2         ;
+0000  00 00 ;             MM    IN2        ; O NOVO 
+;
+0000  00 00 ;             LD    ULTIMO     ;
+0000  00 00 ;             *     H2         ;
+0000  00 00 ;             +     MMS        ;
+0000  00 00 ;             MM    IS1        ; SIMBOLO:
+0000  00 00 ;             +     H2         ;
+0000  00 00 ;             MM    IS2        ;
+;
+0000  00 00 ;     IN1     LD    /00        ; LD LINHA[PLINHA]
+0000  00 00 ;     IS1     MM    /00        ; MM TS[ULTIMO]
+0000  00 00 ;     IN2     LD    /00        ; LD LINHA[PLINHA+2]
+0000  00 00 ;     IS2     MM    /00        ; MM TS[ULTIMO+2]
+
+0310  B2 F0 ;             RS    TSIMB      ; RETORNA
+;
+; O SIMBOLO J� ESTAVA NA TABELA: EXTRAI O ENDERE�O ASSOCIADO
+;
+04A6  94 78 ;     ACHOU   LD    PTS        ; ENCONTROU O SIMBOLO NA TABELA: 
+04A6  94 78 ;             /     H2         ; ACERTA CURSOR PARA TABELA SIMPLES;
+04A4  94 78 ;             +     LDE        ; MONTA "LD TENDER[PTS/2]"
+04A6  94 78 ;             MM    LEND       ; PARA EXECUTAR EM LEND;
+04A4  94 78 ;             +     H1000      ; MONTA "MM TENDER[PTS/2]"
+04A6  94 78 ;             MM    MMEND      ; PARA EXECUTAR EM MMEND
+04A6  94 78 ;             MM    MMEND1     ; E TAMB�M EM MMEND1;
+;
+04A6  94 78 ;     LEND    LD    /00        ; OBT�M O ENDERE�O ASSOCIADO AO SIMBOLO;
+;
+0304  23 1A ;             JN    ASSOCIA    ; SE ESTAVA INDEFINIDO: =>ASSOCIA
+0306  80 40 ;             LD    RTOP       ; SE FOR CAMPO DE R�TULO (RTOP=0)
+0308  13 0C ;             JZ    R1         ; E SE J� ESTAVA DEFINIDO: =>R1
+030A  B2 F0 ;             RS    TSIMB      ; CASO CONTR�RIO, RETORNA
+;
+030C  80 9C ;     R1      LD    DUPDEF     ; R�TULO DUPLAMENTE DEFINIDO
+030E  A3 80 ;             SC    ERRO       ; EMITE MENSAGEM DE ERRO
+0310  B2 F0 ;             RS    TSIMB      ; RETORNA
+;
+; ASSOCIA��O DO ENDERE�O AO S�MBOLO 
+;
+031A  80 40 ;     ASSOCIA LD    RTOP       ; TESTA (R�TULO=0 / OPERANDO=-1)
+031C  13 26 ;             JZ    R2         ; SE � CAMPO DE R�TULO: => R2
+;
+; � CAMPO DE OPERANDO, E O ENDERE�O ASSOCIADO AO SIMBOLO EST� INDEFINIDO:
+;
+031E  80 14 ;             LD    OP         ; � OPERANDO (RTOP=/FFFF): 
+0320  A3 CE ;     MMEND   MM    /00        ; ASSOCIA /FFFF(INDEF.) AO SIMBOLO
+0322  A3 EA ;             SC    PEND       ; INCLUI NAS PENDENCIAS
+0324  B2 F0 ;             RS    TSIMB      ; RETORNA
+;
+; � CAMPO DE R�TULO, E O ENDERE�O ASSOCIADO AO SIMBOLO EST� INDEFINIDO:
+;
+0326  80 36 ;     R2      LD    IC         ; � CAMPO DE R�TULO:
+0328  A3 CE ;     MMEND1  MM    /00        ; ASSOCIA IC AO SIMBOLO
+032A  A3 DA ;             SC    ESVP       ; ESVAZIA LISTA DE PENDENCIAS
+032C  B2 F0 ;             RS    TSIMB      ; RETORNA
+;
+; ==================================================================
+; PEND - INCLUI NOVA PEND�NCIA PARA O SIMBOLO CORRENTE  - �JJN/2005
+;        NA LISTA LIGADA DE PEND�NCIAS A ELE ASSOCIADA
+;
+; RECEBE PTS = CURSOR PARA O SIMBOLO CORRENTE
+; RECEBE OPCODE = C�DIGO DE OPERA��O DA INSTRU��O PENDENTE
+; RECEBE IC = LOCAL ONDE O C�DIGO SER� GERADO OPORTUNAMENTE
+;
+;                                                                    CODIFICAR
+;
+0000  00 00 ;     NONE   LD    EP          ; C�DIGO DE EXCESSO DE PEND�NCIAS
+0000  00 00 ;            SC    ERRO        ; MENSAGEM DE ERRO
+0000  00 00 ;            RS    PEND        ; RETORNA
+;
+0000  00 00 ;     PEND   JP    /0000       ; ENTRADA DE PEND
+;
+0000  00 00 ;            LD    PAVAIL      ; INICIO DA AVAIL LIST (1 EM 1)
+0000  00 00 ;            JN    NONE        ; N�O H� C�LULA VAZIA => NONE
+;
+0000  00 00 ;            LD    PTS         ;
+0000  00 00 ;            /     H2          ;
+0000  00 00 ;            +     LDTL        ; 
+0000  00 00 ;            MM    LDLKS       ; " LD TLINKS[PTS]"
+0000  00 00 ;            +     H1000       ;
+0000  00 00 ;            MM    MMLKS       ; " MM TLINKS[PTS]"
+;
+; MEMORIZA ATUAL INICIO DA LISTA DE PENDENCIAS DO SIMBOLO
+;
+0000  00 00 ;     LDLKS  LD    /00         ; SALVA EM AUX O ATUAL LINK DE PENDENCIAS
+0000  00 00 ;            MM    AUX         ; LINK P/LISTA DE PENDENCIAS(1 EM 1)
+;
+; C�LULA VAZIA � O NOVO INICIO DA LISTA DE PENDENCIAS DO SIMBOLO
+;
+0000  00 00 ;            LD    PAVAIL      ; NOVO INICIO DA LISTA DE PENDENCIAS=[PAVAIL]
+0000  00 00 ;     MMLKS  MM    /00         ; MM TLINKS[PTS] SUBSTITUI LINK DE PENDENCIAS
+;
+; ANTIGO LINK DA C�LULA VAZIA AGREGADA PASSA A SER NOVO INICIO DA AVAIL LIST
+;
+0000  00 00 ;            *     H6          ;
+0000  00 00 ;            -     H6          ;
+0000  00 00 ;            +     LDTPEND     ; 
+0000  00 00 ;            MM    LDTL        ; " LD TPEND[6*(AUX-1)]"
+0000  00 00 ;     LDTL   LD    /00         ; OBTEM LINK P/PR�X. C�LULA VAZIA
+0000  00 00 ;            MM    PAVAIL      ; ATUALIZA PONTEIRO P/ AVAIL LIST
+;
+; ANTIGA C�LULA VAZIA AGORA VAI APONTAR A ANTIGA LISTA DE PENDENCIAS DO SIMBOLO
+;
+0000  00 00 ;            LD    LDTL        ; ATUALIZA LINK DA ANTIGA C�LULA VAZIA
+0000  00 00 ;            +     H1000       ;
+0000  00 00 ;            MM    MMTL        ; COMPONENTE DE LINK
+0000  00 00 ;            +     H2          ;
+0000  00 00 ;            MM    MMTL1       ; COMPONENTE DE OPCODE
+0000  00 00 ;            +     H2          ;
+0000  00 00 ;            MM    MMTL2       ; COMPONENTE DE LOCAL
+;
+; COMPLETA A CONEX�O DA NOVA C�LULA
+;
+0000  00 00 ;            LD    AUX         ; RECUPERA ANTIGO LINK DE PENDENCIAS
+0000  00 00 ;     MMTL   MM    /00         ; MM TPEND[6*(AUX-1)]
+;
+; AGORA J� SE PODE PREENCHER A C�LULA REC�M-INSERIDA
+;
+; INSERE CAMPO DE OPCODE
+;
+0000  00 00 ;            LD OPCODE         ;
+0000  00 00 ;     MMTL1  MM /00            ; MM TPEND[6*(AUX-1)+2]
+;
+; INSERE CAMPO DE LOCAL
+;
+0000  00 00 ;            LD CI             ;
+0000  00 00 ;     MMTL2  MM /00            ; MM TPEND[6*(AUX-1)+4]
+;
+0000  00 00 ;            RS PEND           ; RETORNA
+;
+;
+; ==================================================================
+;
+0000  00 00 ;     LDTL   LD TLINKS         ; MATRIZ PARA LD TLINKS[PTS]
+0000  00 00 ;     PAVAIL K  /0000
+;
+; ==================================================================
+; ESVP - REMOVE PEND�NCIAS DO SIMBOLO CORRENTE E GERA O RESPECTIVO C�DIGO  - �JJN/2005
+; 
+;        RECEBE, COMO ENTRADA, A LISTA DE PEND�NCIAS DO SIMBOLO CORRENTE
+;
+;        PARA CADA PEND�NCIA DA LISTA, GERA UMA LINHA 
+;        NO ARQUIVO DE SA�DA COM O C�DIGO CORRESPONDENTE 
+;
+0000  00 00 ;     ESVP   JP    /00         ; ENTRADA DE ESVP "ESVAZIA LISTA DE PEND."       
+;
+0000  00 00 ;            LD    PTS         ; MONTA E GUARDA ADIANTE, 
+0000  00 00 ;            /     H2          ;    PARA EXECUTAR, 
+0000  00 00 ;            +     LDTL        ;        AS INSTRU��ES
+0000  00 00 ;            MM    LDLKS1      ; " LD TLINKS[PTS]"
+0000  00 00 ;            +     M1000       ;    E 
+0000  00 00 ;            MM    MMLKS1      ; " MM TLINKS[PTS]"
+0000  00 00 ;            MM    MMLKS2      ; " MM TLINKS[PTS]"
+;
+0000  00 00 ;     LDLKS1 LD    /00         ; OBT�M LINK PARA LISTA DE PENDENCIAS
+0000  00 00 ;            MM    AUX1        ; MEMORIZA EM AUX1
+0000  00 00 ;            MM    AUX         ; SALVA EM AUX (VARI�VEL DE TRABALHO)
+;
+0000  00 00 ;     OUTRA  LD    AUX         ; MONTA E GUARDA ADIANTE,
+0000  00 00 ;            *     H6          ;    PARA EXECUTAR,
+0000  00 00 ;            -     H6          ;        AS INSTRU��ES
+0000  00 00 ;            +     LDTPEND     ;            SEGUINTES:
+0000  00 00 ;            MM    LDTL1       ; " LD TPEND[6*(PTS-1)]" (LINK)
+0000  00 00 ;            +     H2          ;
+0000  00 00 ;            MM    LDTL3       ; " LD TPEND[6*(PTS-1)+2]" (OPCODE)
+0000  00 00 ;            +     H2          ;
+0000  00 00 ;            MM    LDTL4       ; " LD TPEND[6*(PTS-1)+4]" (LOCAL)
+;
+0000  00 00 ;     LDTL4  LD    /00         ; OBTEM LOCAL DO C�DIGO DESTA PENDENCIA
+0000  00 00 ;            SC    BINHEX      ; GERA ESSE ENDERE�O NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;            LD    SPC2        ; GERA DOIS ESPA�OS
+0000  00 00 ;            PD    /3          ; NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;     LDTL3  LD    /00         ; OBT�M OPCODE DA INSTRU��O A GERAR
+0000  00 00 ;            +     IC          ; COMP�E C/O OPERANDO REC�M DEFINIDO
+0000  00 00 ;            SC    BINHEX      ; GERA O C�DIGO MONTADO NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;            LD    SPCPV       ; GERA ESPA�O E PONTO-E-VIRGULA
+0000  00 00 ;            PD    /3          ; NO ARQUIVO DE SAIDA
+0000  00 00 ;            LD    CRLF        ; GERA FIM DE LINHA
+0000  00 00 ;            PD    /3          ; NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;     LDTL1  LD    /00         ; OBTEM LINK P/PR�X. PENDENCIA
+0000  00 00 ;            MM    AUX         ; GUARDA COMO LINK DE TRABALHO E
+0000  00 00 ;     MMLKS1 MM    /00         ; GUARDA COMO LINK P/ LISTA DE PENDENCIAS
+;
+; H� OUTRA PEND�NCIA: GERA C�DIGO CORRESPONDENTE E ELIMINA DA LISTA DE PENDENCIAS
+;
+0000  00 00 ;            LD    LDTL1       ; " LD TPEND[6*(PTS-1)]" (LINK)
+0000  00 00 ;            +     H1000       ; CONVERTE EM
+0000  00 00 ;            MM    MMTL1       ; " MM TPEND[6*(PTS-1)]" (LINK)
+;
+0000  00 00 ;            LD    PAVL        ; OBTEM PONTEIRO PARA AVAIL LIST
+0000  00 00 ;            MM    AUX2        ; SALVA; GUARDA COMO LINK P/PROX PENDENCIA:
+0000  00 00 ;     MMTL1  MM    /00         ; " MM TPEND[6*(PTS-1)]" (LINK)
+;
+0000  00 00 ;            LD    AUX1        ; RECUPERA LINK P/ LISTA DE PENDENCIAS
+0000  00 00 ;            MM    PAVAIL      ; ATUALIZA PONTEIRO PARA AVAIL LIST
+;
+0000  00 00 ;            LD    AUX         ; RECUPERA LINK PARA PROXIMA PENDENCIA
+0000  00 00 ;     MMLKS2 MM    /00         ; GUARDA COMO LINK PARA LISTA DE PENDENCIAS
+0000  00 00 ;            JN    ULTMA       ; LINK<0: N�O H� MAIS PENDENCIAS: VAI RETORNAR
+0000  00 00 ;            JP    OUTRA       ; AINDA H� PENDENCIAS: VAI TRATAR PROXIMA
+;
+0000  00 00 ;     ULTMA  RS    ESVP        ; RETORNA
+;
+;
+; ==================================================================
+; �REAS DE DADOS DA TABELA DE SIMBOLOS  - �JJN/2005
+;
+0000  00 00 ; PAMAXSIMB  K    /100        ; NUMERO MAXIMO DE SIMBOLOS PERMITIDO = 256
+0000  00 00 ; TS         K    /00         ; TABELA DE SIMBOLOS
+;                        @    *+/200
+0000  00 00 ; TENDER     K    /00
+;                        @    *+/100
+0000  00 00 ; TPEND      K    /00
+;                        @    *+/100
+;
+0000  00 00 ; H1000      K    /1000       ; SOMADO, TRANSFORMA UMA INSTRU��O LD EM MM
+;
+0000  00 00 ; MMS        MM   TS          ; MATRIZ DE " MM TS"
+0000  00 00 ; MMTPEND    MM   TPEND       ; MATRIZ DE " MM TPEND"
+0000  00 00 ; LDE        LD   TENDER      ; MATRIZ DE " LD TENDER"
+0000  00 00 ; MMTENDER   MM   TENDER      ; MATRIZ DE " MM TPEND"
+;
+;
+; ====================================================================
+; �REAS DE DADOS DAS ROTINAS DE TABELAS DE S�MBOLOS  - �JJN/2005
+;
+;
+;  (02F0 A 0232 �REA LIVRE - ANTIGA TSIMB)
+;
+0000  00 00 ; SBTS  -   TS  ; MATRIZ PARA INDEXAR A LEITURA DA TABELA DE SIMBOLOS
+0000  00 00 ; MMTS  MM  TS  ; MATRIZ PARA INDEXAR ARMAZENAMENTO NA TABELA DE SIMBOLOS
+0000  00 00 ; PTE   K   /0000 ; CURSOR PARA TABELA DE ENDERE�OS TENDER
+; ====================================================================
+; �REAS DE DADOS DAS ROTINAS DE TABELAS DE S�MBOLOS
+;
+0000  00 00 ;     TS      K    /0000     ; TAB.SIMB.: CADA SIMBOLO = 4 BYTES (2 PALAVRAS)
+;                         @    TS+/200   ; DIM. DA TAB.: MAXSIMB= /100 S�MB= /200 BYTES)
+;
+0000  00 00 ;     TENDER  K    /0000     ; TABELA DE ENDERE�OS
+;                         @    TENDER+/100 ; 1 ENDERE�O P/ CADA S�MBOLO (MAXSIMB AO TODO)
+;
+0000  00 00 ;     TLINKS  K    /0000     ; TABELA DE LINKS PARA PEND�NCIAS
+;                         @    TLINKS+/100 ; 1 LINK P/ CADA S�MBOLO (MAXSIMB AO TODO)
+;
+0000  00 00 ;     TPEND   K    /0000     ; TAB.PEND.: CADA PEND. = 6 BYTES (3 PALAVRAS) 
+;                         @    TPEND+/300 ; 1 LINK P/ CADA S�MBOLO (MAXSIMB AO TODO)
+;
+; ====================================================================
+; INICIA - PREENCHE C/ VALORES INICIAIS TODAS AS ESTRUTURAS DE DADOS DO MONTADOR - �JJN/2005
+; ====================================================================
+;
+0000  00 00 ;     INICIA JP /0000
+;
+0000  00 00 ;            LD H0        ; IC:=0
+0000  00 00 ;            MM IC
+;
+; MONTAGEM DAS INSTRU��ES INDEXADAS PARA PREENCHIMENTO DE TABELAS
+;
+0000  00 00 ;            LD MAXSIMB   ; APONTA ULTIMA POSI��O DAS TABELAS SIMPLES
+0000  00 00 ;            MM AUX       ; GUARDA EM AUX (1 EM 1)
+0000  00 00 ;            MM PAVL      ; INICIA CURSOR P/ AVAIL LIST 
+; 
+; INICIA A AVAIL LIST COM TODAS AS C�LULAS DE TPEND (TAB. DE PENDENCIAS)
+;
+0000  00 00 ;            *  H6        ; CALCULA 6*NMAXSIMB
+0000  00 00 ;            +  MMTPEND   ; + "MM TABELA DE PENDENCIAS"
+0000  00 00 ;            -  H6        ; -6     
+0000  00 00 ;            MM MMP       ; GUARDA " MM TPEND+6*(NMAXSIMB-1)"
+;
+0000  00 00 ;     LUP    LD AUX
+0000  00 00 ;            -  H1
+0000  00 00 ;     MMP    MM /00       ; MM TPEND[6*(AUX-1)]
+0000  00 00 ;            MM AUX       ; DECREMENTA AUX
+0000  00 00 ;            JZ SAI
+;
+0000  00 00 ;            LD MMP
+0000  00 00 ;            -  H6
+0000  00 00 ;            MM MMP       ; APONTA C�LULA ANTERIOR DA AVAIL LIST
+0000  00 00 ;            JP LUP
+;
+0000  00 00 ;     SAI    LD MMP
+0000  00 00 ;            MM MMP1      ; VOLTA UMA C�LULA ATR�S
+;
+0000  00 00 ;            LD HFFFF
+0000  00 00 ;     MMP1   MM /00       ; COLOCA -1 ("TERRA" DO AVAIL LIST)
+;
+; PREENCHE COM -1 AS TABELAS DE LINKS ("TERRA") E DE ENDERE�OS ("INDEFINIDOS")
+;
+0000  00 00 ;            LD MAXSIMB   ; APONTA ULTIMA POSI��O DAS TABELAS SIMPLES
+0000  00 00 ;            MM AUX       ; GUARDA EM AUX (1 EM 1)
+;
+0000  00 00 ;            +  MMTLINKS  ; TABELA DE LINKS
+0000  00 00 ;            MM MML
+;
+0000  00 00 ;            LD MAXSIMB
+0000  00 00 ;            +  MMTENDER  ; TABELA DE ENDERE�OS
+0000  00 00 ;            MM MME
+;
+0000  00 00 ;     LLINKS LD HFFFF     ; -1 = "TERRA" DA LISTA LIGADA
+0000  00 00 ;     MML    MM /00       ; MM TLINKS[AUX]
+0000  00 00 ;     MME    MM /00       ; MM TENDER[AUX]
+;
+0000  00 00 ;            LD AUX       ; AUX CURSOR DE TRABALHO (2 EM 2)
+0000  00 00 ;            -  H1        ;
+0000  00 00 ;            JZ FINISH    ;
+;
+0000  00 00 ;            LD MML       ; 
+0000  00 00 ;            +  H2        ; 
+0000  00 00 ;            MM MML       ; APONTA PR�XIMO LINK
+; 
+0000  00 00 ;            LD MME       ; 
+0000  00 00 ;            +  H2        ; 
+0000  00 00 ;            MM MME       ; APONTA PR�XIMO ENDERE�O
+;
+0000  00 00 ;            JP LLINKS    ; LOOP DE PREENCHIMENTO DE LINKS
+;
+0000  00 00 ;     FINISH RS INICIA
+;
+; ==================================================================== 
+;
+; FINAL -- FINALIZA AS ATIVIDADES DO MONTADOR:  - �JJN/2005
+;
+; LOCALIZA O FINAL DA TABELA DE SIMBOLOS
+0000  00 00 ;     FINAL   JP    /00        ; ENTRADA DE FINAL
+;
+0000  00 00 ;     LFINAL  LD    ULTIMO     ; OBTEM INDICADOR DE FIM DA T.S.
+0314  40 04 ;             -     H2         ; DECREMENTA O NUMERO DE SIMBOLOS
+0000  00 00 ;             JZ    ENDASM     ; SAI DO LOOP SE TERMINOU A 
+0316  90 42 ;             MM    ULTIMO     ; TABELA DE SIMBOLOS
+;
+0000  00 00 ;             +     LDLINKS    ; MONTA " LD LINKS[ULTIMO]"
+0000  00 00 ;             MM    MMF        ; GUARDA PARA EXECUTAR
+0000  00 00 ;     MMF     MM    /00        ; OBTEM LINK P/PEND.DESTE SIMB.
+0000  00 00 ;             JN    INDEF      ; SIMBOLO INDEFINIDO : VAI TRATAR
+0000  00 00 ;             JP    LFINAL     ; SIMBOLO DEFINIDO: VOLTA AO LOOP
+;
+; NESTA VERS�O, SIMBOLOS INDEFINIDOS NO FIM DO PROCESSAMENTO S�O TRATADOS COMO ERROS
+;
+0000  00 00 ;     INDEF   LD    LDTS       ; ENDERE�O DA TAB DE SIMBOLOS
+0000  00 00 ;             +     ULTIMO     ; APONTA SIMBOLO CORRENTE (PRIMEIROS 2)
+0000  00 00 ;             MM    LDF1       ; GUARDA PARA EXECUTAR
+0000  00 00 ;             +     H2         ; APONTA PROXIMOS 2 CARACTERES
+0000  00 00 ;             MM    LDF2       ; GUARDA PARA EXECUTAR
+0000  00 00 ;     LDF1    LD    /00        ; LD TS[ULTIMO]
+0000  00 00 ;             PD    /03        ; GRAVA 2 CARACTERES DO SIMB. INDEF.
+0000  00 00 ;     LDF2    LD    /00        ; LD TS[ULTIMO + 2]
+0000  00 00 ;             PD    /03        ; GRAVA MAIS 2 CARACTERES DO SIMB. INDEF.
+0000  00 00 ;             LD    CRLF       ; MUDA DE LINHA
+0000  00 00 ;             PD    /03        ; NO ARQUIVO DE SAIDA
+0000  00 00 ;             LD    ND         ; C�DIGO ND = SIMBOLO INDEFINIDO
+0000  00 00 ;             SC    ERRO       ; EMITE MENSAGEM DE ERRO
+0000  00 00 ;             JP    LFINAL     ; VOLTA AO LOOP
+;
+0000  00 00 ;     ENDASM  RS    FINAL      ; RETORNA
+;
+; ====================================================================
+; ==================================================================== 
+;
+0000  00 00 ;     PAVL    K     /00       ; CURSOR PARA AVAIL LIST DE PENDENCIAS (DE 6 EM 6)
+0000  00 00 ;     PTPEND  K     TPEND     ; APONTA PRIMEIRA POSI��O DA TABELA DE PENDENCIAS
+0000  00 00 ;     PTPEND6 K     TPEND+6   ; APONTA SEGUNDA POSI��O DA TABELA DE PENDENCIAS
+;
+; ====================================================================
+; GERA - GERA UMA LINHA MONTADA NO ARQUIVO DE SAIDA  - �JJN/2005
+;        DE C�DIGO DO MONTADOR, EM FORMATO COMPAT�VEL COM
+;        DO LOADER HEXADECIMAL
+;
+0000  00 00 ;      GERA   JP    /00     ; ENTRADA DE GERA      
+0296  80 36 ;             LD    IC      ; GERA ENDERE�O DA INSTRU��O
+0298  E0 03 ;             SC    BINHEX  ; NO ARQUIVO DE SAIDA EM DISCO
+;
+0298  E0 03 ;             LD    SPC2    ; GERA DOIS ESPA�OS
+0298  E0 03 ;             PD    /3      ; NO ARQUIVO DE SA�DA
+;
+029E  80 3A ;             LD    OPCODE  ; COMP�E C�DIGO DE OPERA��O
+02A0  40 38 ;             +     OPERAND ; COM OPERANDO NO ACUMULADOR
+0298  E0 03 ;             SC    BINHEX  ; GERA C�DIGO CORRESP. NO ARQUIVO DE SAIDA
+;
+02A4  80 1E ;             LD    SPCPV   ; GERA ESPA�O E PONTO-E-V�RGULA
+02A6  E0 03 ;             PD    /3      ; NO ARQUIVO DE SA�DA EM DISCO
+;
+0000  00 00 ;             SC    FONTE   ; GERA NA SAIDA C�PIA DA LINHA FONTE
+;
+02A8  80 26 ;             LD    CRLF    ; GERA FINAL DE LINHA
+02AA  E0 03 ;             PD    /3      ; NO ARQUIVO DE SA�DA EM DISCO
+;
+0000  00 00 ;             RS    GERA    ; RETORNA
+;
+; ====================================================================
+; FONTE - GERA UM COMENT�RIO CONTENDO C�PIA DA LINHA DO TEXTO FONTE  - �JJN/2005
+;
+;         USA COMO ENTRADA O CONTE�DO DO VETOR LINHA
+;         E A INSTRU��O MM CONTIDA NA POSI��O GUARDA2, CUJO OPERANDO
+;         MEMORIZA A �LTIMA POSI��O DO VETOR LINHA, ANTERIORMENTE PREENCHIDA.
+;
+;         GERA, NO ARQUIVO DE SAIDA, TODOS OS CARACTERES CONTIDOS EM LINHA
+;
+0000  00 00 ;      FONTE  JP    /00     ; ENTRADA DE FONTE
+;
+0000  80 00 ;             LD    GUARDA2 ; RECUPERA " MM LINHA[ULTIMA POSI��O PREENCHIDA]"
+0000  50 00 ;             -     H9000   ; REMOVE INSTRU��O MM P/ SEPARAR O ENDERE�O
+0000  90 00 ;             MM    LAST    ; GUARDA PARA IDENTIFICAR ULTIMA POSI��O A COPIAR
+;
+0000  80 00 ;             LD    H0      ; APONTA INICIO DA 
+0000  90 3C ;             MM    PLINHA  ; LINHA A SER COPIADA
+;
+0000  40 00 ;      LOOPF  +     LD      ; COMP�E COM INSTRU��O LD
+0000  90 00 ;             MM    LDF     ; GUARDA PARA EXECUTAR ADIANTE
+;
+;     A PR�XIMA INSTRU��O EQUIVALE �S DUAS SEGUINTES:
+;               +     H2      ; APONTA PROXIMO CARACTERE
+;               -     H4000   ; SUBTRAI 4 DO C�D.OPER. => INSTR. SOMA 
+;   
+0000  00 00 ;             -     H3FFE   ; /3FFE = /4000 - /0002
+;
+0000  00 00 ;             MM    ADDF    ; GUARDA PARA EXECUTAR ADIANTE
+;
+0000  00 00 ;      LDF    LD    /00     ; OBT�M PR�XIMO CARACTERE A COPIAR
+0000  00 00 ;             *     H100    ; POSICIONA NO BYTE ESQUERDO
+0000  00 00 ;      ADDF   +     /00     ; COMP�E COM O SEGUNDO CARACTERE
+0000  00 00 ;             PD    /3      ; GRAVA OS DOIS CARACTERES NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;             LD    PLINHA  ; POSICIONA PLINHA
+0000  00 00 ;             +     H4      ; NO PRIMEIRO DOS PROXIMOS 2 CARACTERES
+0000  00 00 ;             MM    PLINHA  ; ATUALIZA PLINHA
+;
+0000  00 00 ;             -     LAST    ; COMPARA COM ULTIMA POSI��O A COPIAR
+0000  00 00 ;             JN    LOOPF   ; SE N�O ATINGIU, VOLTA AO LOOP
+0000  00 00 ;             JZ    LOOPF   ; SE � EXATAMENTE O �LTIMO, VOLTA AO LOOP TAMB�M
+0000  00 00 ;             RS    FONTE   ; CASO CONTR�RIO, TERMINOU, E RETORNA
+;
+; ====================================================================
+;
+; *** BH - CONVERTE UM NIBBLE PARA HEXADECIMAL - �JJN/2005
+;
+;          RECEBE O DADO NO ACUMULADOR (NUMERO BIN�RIO DE 4 BITS S/SINAL)
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA (EXEMPLO):
+;
+;           LD INFASC ; SUPONDO QUE INFASC TENHA UM NIBBLE
+;           SC BH     ; BH CONVERTE-O PARA DIGITO HEXA EM ASCII, E
+;           MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+;                     ; MAS TAMB�M EST� DISPON�VEL EM RESUL
+;
+;                                                                          
+0422  00 00 ;      BH      JP /00     ; ENTRADA DE HB
+0424  91 90 ;              MM DADO    ; SALVA EM DADO A INFORMA��O RECEBIDA NO ACUMULADOR
+042E  81 36 ;              LD PPBHEX  ; ENDERE�O DE BHEX (TABELA BIN�RIA DE D�GITOS HEXA)
+0428  91 92 ;              MM PTX
+042A  81 22 ;              LD PDHEX   ; COMPRIMENTO DA TABELA DHEX 
+042C  91 94 ;              MM CTX
+0426  81 2C ;              LD PPDHEX  ; ENDERE�O DE DHEX (TABELA ASCII DE DIGITOS HEXA)
+0430  91 96 ;              MM PTY
+0432  A3 F2 ;              SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+0434  B4 22 ;              RS BH      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+;
+; ====================================================================
+; ====================================================================
+;  *** BINHEX - ROTINA DE CONVERS�O BIN�RIO PARA HEXADECIMAL ***  �JJN/2005 
+;               ENTRADA NO ACUMULADOR - NUMERO BIN�RIO DE 16 BITS
+;               RESULTADO: 4 CARACTERES ASCII NO ARQUIVO DE SAIDA
+;                                                                          OK CODIFICADO
+0436  00 00 ;     BINHEX  JP    /00        ; ENTRADA DE BINHEX
+;
+0000  00 00 ;             MM    AUX        ; SALVA NUMERO ORIGINAL
+0000  00 00 ;             LD    H1000      ; FAZ FATOR=2**12 
+;
+0000  00 00 ;     LPBHEX  MM    FATOR      ; POSICIONA NO PR�XIMO NIBBLE A TRATAR
+;
+0000  00 00 ;             LD    AUX        ; RECUPERA O QUE RESTA DO NUMERO ORIGINAL
+0000  00 00 ;             /     FATOR      ; OBTEM PROXIMO NIBBLE MAIS SIGNIFICATIVO
+0000  00 00 ;             MM    AUX1       ; SALVA-O
+;
+0000  00 00 ;             SC    BH         ; CONVERTE PARA HEXADECIMAL (ASCII)
+0000  00 00 ;             PD    /3         ; GERA-O NO ARQUIVO DE SAIDA
+;
+0000  00 00 ;             LD    AUX1       ; RECUPERA O �LTIMO NIBBLE TRATADO
+0000  00 00 ;             *     FATOR      ; POSICIONA-O ADEQUADAMENTE
+0000  00 00 ;             MM    AUX1       ; GUARDA PARA SUBTRAIR ADIANTE
+
+0000  00 00 ;             LD    AUX        ; RECUPERA O RESTANTE DO NUMERO 
+0000  00 00 ;             -     AUX1       ; REMOVE O NIBBLE TRATADO
+0000  00 00 ;             MM    AUX        ; GUARDA PARA TRATAR O PR�XIMO NIBBLE
+;
+0000  00 00 ;             LD    FATOR      ; FAZ FATOR
+0000  00 00 ;             /     H10        ; := FATOR/(2**4)
+0000  00 00 ;             JZ    FIMBHEX    ; SE ESGOTOU OS 4 DIGITOS, VAI RETORNAR
+0000  00 00 ;             JP    LPBHEX     ; SE N�O, VOLTA AO LOOP
+;
+0000  00 00 ;     FIMBHEX RS    BINHEX     ; RETORNA
+;
+; ====================================================================
+; ROTINAS ADICIONAIS, A SEREM CODIFICADAS EM LINGUAGEM DE M�QUINA
+; ====================================================================
+;
+; *** OB - CONVERTE UM DIGITO OCTAL PARA BIN�RIO - �JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INVALIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC  ; SUPONDO QUE INFASC TENHA UM DIGITO DECIMAL
+;                        SC OB      ; OB CONVERTE-O PARA BIN�RIO, E
+;                        MM INFBIN  ; O RESULTADO PODE SER GUARDADO EM INFBIN
+;                                   ; MAS TAMB�M EST� DISPON�VEL EM RESUL
+;
+0000  00 00 ;      OB    JP /00     ; ENTRADA DE OB
+0000  00 00 ;            MM DADO    ; SALVA EM DADO A INFORMA��O RECEBIDA NO ACUMULADOR
+0000  00 00 ;            LD PPDOCT  ; ENDERE�O DE DDEC (TABELA ASCII DE DIG. OCTAIS)
+0000  00 00 ;            MM PTX
+0000  00 00 ;            LD PDOCT   ; COMPRIMENTO DA TABELA DDEC 
+0000  00 00 ;            MM CTX
+0000  00 00 ;            LD PPBOCT  ; ENDERE�O DE BDEC (TABELA BIN�RIA DE D�G. DECIMAIS)
+0000  00 00 ;            MM PTY
+0000  00 00 ;            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+0000  00 00 ;            RS OB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+;
+;
+; ====================================================================
+;  *** OCTBIN - ROTINA DE CONVERS�O OCTAL PARA BIN�RIO *** verificar - �JJN/2005
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;
+03F2  00 00 ;     OCTBIN  JP    /00        ; ENTRADA DE OCTBIN
+03F4  80 00 ;             LD    H0         ; INICIA OPERAND
+03F6  90 38 ;             MM    OPERAND    ; COM ZERO
+03F8  80 3C ;             LD    PLINHA     ; MONTA INSTRU��O
+03FA  41 08 ;             +     LD         ; "LD LINHA[PLINHA]"
+03FC  93 FE ;     D6      MM    PR         ; GUARDA PARA EXECUTAR ADIANTE
+03FE  80 3C ;     PR      LD    LINHA      ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+03FC  93 FE ;             SC    0B         ; CONVERTE PARA BIN�RIO
+03FC  93 FE ;             JN    FORA       ; N�O ERA D�GITO OCTAL: ACABOU
+03FC  93 FE ;             LD    OPERAND    ; OBTEM RESULTADO DA CONVERS�O (AC, RESUL)
+03FC  93 FE ;             *     H08        ; ERA: MULTIPLICA OPERAND POR /08
+03FC  93 FE ;             +     RESUL      ; SOMA O D�GITO CONVERTIDO
+03FC  93 FE ;             MM    OPERAND    ; ATUALIZA OPERAND
+041A  83 FE ;             LD    PR         ; MODIFICA NOVAMENTE A INSTRU��O
+041C  50 04 ;             +     H2         ; APONTANDO O PR�XIMO CARACTERE
+041E  03 FA ;             JP    D6         ; VAI TRATAR OUTRO DIGITO
+0420  B3 F2 ;     FORA    RS    OCTBIN     ; N�O � D�GITO: RETORNA
+;
+;
+; ====================================================================
+;
+; *** BB - CONVERTE UM D�GITO BIN�RIO PARA BIN�RIO - �JJN/2005
+;          RECEBE O DADO NO ACUMULADOR
+;          RETORNA O RESULTADO NO ACUMULADOR E RESUL (SE INV�LIDO, RETORNA -1)
+;
+; SEQUENCIA DE CHAMADA:
+;                        LD INFASC ; SUPONDO QUE INFASC TENHA UM DIGITO BIN�RIO
+;                        SC BB     ; BB CONVERTE-O PARA BIN�RIO, E
+;                        MM INFBIN ; O RESULTADO PODE SER GUARDADO EM INFBIN
+;                                  ; MAS TAMB�M EST� DISPON�VEL EM RESUL
+;
+0000  00 00 ;      BB    JP /00     ; ENTRADA DE BB
+0000  00 00 ;            MM DADO    ; SALVA EM DADO A INFORMA��O RECEBIDA NO ACUMULADOR
+0000  00 00 ;            LD PPDBIN  ; ENDERE�O DE DDEC (TABELA ASCII DE DIG. BIN�RIOS)
+0000  00 00 ;            MM PTX
+0000  00 00 ;            LD PDBIN   ; COMPRIMENTO DA TABELA DDEC 
+0000  00 00 ;            MM CTX
+0000  00 00 ;            LD PPBBIN  ; ENDERE�O DE BDEC (TABELA BIN�RIA DE D�G. BIN�RIOS)
+0000  00 00 ;            MM PTY
+0000  00 00 ;            SC TRADUZ1 ; CHAMA A SUBROTINA TRADUZ1
+0000  00 00 ;            RS BB      ; RETORNA COM O RESULTADO NO ACUMULADOR E RESUL
+;
+; ====================================================================
+;  *** BINBIN - ROTINA DE CONVERS�O BIN�RIO PARA BIN�RIO *** verificar - �JJN/2005
+;               ENTRADA EM LINHA[PLINHA] E SEGUINTES
+;               RESULTADO EM OPERAND
+;
+03F2  00 00 ;     BINBIN  JP    /00        ; ENTRADA DE BINBIN
+03F4  80 00 ;             LD    H0         ; INICIA OPERAND
+03F6  90 38 ;             MM    OPERAND    ; COM ZERO
+03F8  80 3C ;             LD    PLINHA     ; MONTA INSTRU��O
+03FA  41 08 ;             +     LD         ; "LD LINHA[PLINHA]"
+03FC  93 FE ;     D6      MM    PR         ; GUARDA PARA EXECUTAR ADIANTE
+03FE  80 3C ;     PR      LD    LINHA      ; MM LINHA[PLINHA] (TRAZ EM ASCII)
+03FC  93 FE ;             SC    BB         ; CONVERTE PARA BIN�RIO
+03FC  93 FE ;             JN    FORA       ; N�O ERA D�GITO HEXA: ACABOU
+03FC  93 FE ;             LD    OPERAND    ; OBTEM RESULTADO DA CONVERS�O (AC, RESUL)
+03FC  93 FE ;             *     H0A        ; ERA: MULTIPLICA OPERAND POR (/0A = 10)
+03FC  93 FE ;             +     RESUL      ; SOMA O D�GITO CONVERTIDO
+03FC  93 FE ;             MM    OPERAND    ; ATUALIZA OPERAND
+041A  83 FE ;             LD    PR         ; MODIFICA NOVAMENTE A INSTRU��O
+041C  50 04 ;             +     H2         ; APONTANDO O PR�XIMO CARACTERE
+041E  03 FA ;             JP    D6         ; VAI TRATAR OUTRO DIGITO
+0420  B3 F2 ;     FORA    RS    BINBIN     ; N�O � D�GITO: RETORNA
+;
+;
+; ID�IA -- UNIFICAR TROTULO E CONV **********************
+;
+;
+;                         #     /ASMB

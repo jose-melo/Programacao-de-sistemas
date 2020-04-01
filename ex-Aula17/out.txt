@@ -1,0 +1,11 @@
+Unexpected end of file has occurred. The following elements are not closed: pref, preferences. Line 22, position 36.
+Directory '/home/jose/.config/bless/plugins' not found.
+Directory '/home/jose/.config/bless/plugins' not found.
+Directory '/home/jose/.config/bless/plugins' not found.
+Could not find file "/home/jose/.config/bless/export_patterns".
+Could not find file "/home/jose/.config/bless/history.xml".
+Document does not have a root element.
+Sharing violation on path /home/jose/.config/bless/preferences.xml
+Sharing violation on path /home/jose/.config/bless/preferences.xml
+Sharing violation on path /home/jose/.config/bless/preferences.xml
+Document does not have a root element.
